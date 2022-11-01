@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 INSTANCE, PROCEEDING, OTHER, CLAIM, DUTY_PROPERTY, DUTY_ORDER = range(6)
 SUBJECT, COURT_1, COURT_2, ADM_CASE, DUTY_ADM_CASE, DUTY_DOCUMENTS = range(6, 12)
-base_value = 32
+base_value = 32.0
 status_log = dict()
 
 
@@ -331,12 +331,13 @@ def define_number_of_documents(update, _):
 
 def determine_size_of_state_duty_for_property_claim(update, _):
     logger.info(f"User {status_log['name']} has specified the price of the claim - {update.message.text}")
-    convert_claim_price = converting_user_amount(str(update.message.text))
-    print(convert_claim_price)
-    if not convert_claim_price:
+    try:
+        convert_claim_price = converting_user_amount(str(update.message.text))
+    except ValueError:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
     else:
+        print(convert_claim_price)
         state_duty = round(calculating_state_duty_for_property(convert_claim_price), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
@@ -345,12 +346,13 @@ def determine_size_of_state_duty_for_property_claim(update, _):
 
 def determine_size_of_state_duty_for_order_claim(update, _):
     logger.info(f"User {status_log['name']} has specified amount of recovery - {update.message.text}")
-    convert_amount_of_recovery = converting_user_amount(str(update.message.text))
-    print(convert_amount_of_recovery)
-    if not convert_amount_of_recovery:
+    try:
+        convert_amount_of_recovery = converting_user_amount(str(update.message.text))
+    except ValueError:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
     else:
+        print(convert_amount_of_recovery)
         state_duty = round(calculating_state_duty_for_order(convert_amount_of_recovery), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
@@ -359,31 +361,45 @@ def determine_size_of_state_duty_for_order_claim(update, _):
 
 def determine_size_of_state_duty_for_administrative_case(update, _):
     logger.info(f"User {status_log['name']} has specified the size of fine - {update.message.text}")
-    str_to_list_fine = converting_user_fine(str(update.message.text))
-    convert_fine = converting_user_amount(str_to_list_fine[0])
-    print(convert_fine)
     convert_b_v = base_value
+    str_to_list_fine = converting_user_fine(str(update.message.text))
     if len(str_to_list_fine) == 2:
-        convert_b_v = converting_user_amount(str_to_list_fine[1])
-        print(convert_b_v)
-    if not convert_fine or not convert_b_v:
+        try:
+            convert_fine = converting_user_amount(str_to_list_fine[0])
+            convert_b_v = converting_user_amount(str_to_list_fine[1])
+        except ValueError:
+            update.message.reply_text(raise_incorrect_value()[0])
+            update.message.reply_text(raise_incorrect_value()[1])
+        else:
+            state_duty = round(calculating_state_duty_for_administrative_case(convert_fine, convert_b_v), 2)
+            update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
+                                      parse_mode='HTML')
+            return ConversationHandler.END
+    elif len(str_to_list_fine) == 1:
+        try:
+            convert_fine = converting_user_amount(str_to_list_fine[0])
+        except ValueError:
+            update.message.reply_text(raise_incorrect_value()[0])
+            update.message.reply_text(raise_incorrect_value()[1])
+        else:
+            state_duty = round(calculating_state_duty_for_administrative_case(convert_fine, convert_b_v), 2)
+            update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
+                                      parse_mode='HTML')
+            return ConversationHandler.END
+    else:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
-    else:
-        state_duty = round(calculating_state_duty_for_administrative_case(convert_fine, convert_b_v), 2)
-        update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
-                                  parse_mode='HTML')
-        return ConversationHandler.END
 
 
 def determine_size_of_state_duty_for_get_documents(update, _):
     logger.info(f"User {status_log['name']} has specified the number of pages - {update.message.text}")
-    convert_pages = converting_user_pages(str(update.message.text))
-    print(convert_pages)
-    if not convert_pages:
+    try:
+        convert_pages = converting_user_pages(str(update.message.text))
+    except ValueError:
         update.message.reply_text('Значение количества страниц должно быть целым неотрицательным числом')
         update.message.reply_text(raise_incorrect_value()[1])
     else:
+        print(convert_pages)
         state_duty = round(calculating_state_duty_for_get_documents(convert_pages), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
@@ -523,31 +539,30 @@ def determine_size_of_state_duty_for_newly_facts(update, _):
     return ConversationHandler.END
 
 
-def converting_user_amount(amount):
+def converting_user_amount(amount: str) -> float:
     amount = re.sub(',', '.', amount)
     amount = re.sub(' ', '', amount)
-    data_type_check = re.search('^\d+\.*\d*$', amount)
+    data_type_check = re.search(r'^\d+\.*\d*$', amount)
     if data_type_check:
         if float(amount) >= 0:
             return round(float(amount), 2)
-        return None
-    return None
+        raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
+    raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
 
 
-def converting_user_fine(fine):
-    if fine.count('=') == 1:
-        return fine.split('=')
-    return [fine]
+def converting_user_fine(fine: str) -> list:
+    return fine.split('=') if fine.count('=') == 1 else [fine]
 
 
-def converting_user_pages(number):
+def converting_user_pages(number: str) -> int:
     if number.isdigit() and int(number) >= 0:
         return int(number)
-    return None
+    else:
+        raise ValueError('Number (value) must be a string that can be converted to a non-negative integer.')
 
 
-def calculate_coefficient():
-    coefficient = 1
+def calculate_coefficient() -> float:
+    coefficient = 1.0
     if 'instance' in status_log and status_log['instance'] in {'appeal', 'cassation', 'supervisory'}:
         coefficient *= 0.8
     if 'claim' in status_log and status_log['claim'] == 'quality_of_goods_claim':
@@ -555,41 +570,50 @@ def calculate_coefficient():
     return coefficient
 
 
-def calculating_state_duty_for_property(claim_price):
+def calculating_state_duty_for_property(claim_price: float) -> float:
     coefficient = calculate_coefficient()
-    if claim_price * 0.05 < base_value * 25:
+    if 0 <= claim_price * 0.05 < base_value * 25:
         return base_value * 25 * coefficient
-    if claim_price < base_value * 1000:
+    elif claim_price * 0.05 >= base_value * 25 and claim_price < base_value * 1000:
         return claim_price * 0.05 * coefficient
-    if claim_price < base_value * 10000:
+    elif base_value * 1000 <= claim_price < base_value * 10000:
         return base_value * 1000 * 0.05 + (claim_price - (base_value * 1000)) * 0.03 * coefficient
-    else:
+    elif claim_price >= base_value * 10000:
         if claim_price * 0.01 < base_value * 1000 * 0.05 + base_value * 9000 * 0.03:
             return base_value * 1000 * 0.05 + base_value * 9000 * 0.03 * coefficient
         return claim_price * 0.01 * coefficient
+    else:
+        raise ValueError('Claim price (value) must be non-negative number.')
 
 
-def calculating_state_duty_for_order(amount_of_recovery):
+def calculating_state_duty_for_order(amount_of_recovery: float) -> float:
     coefficient = calculate_coefficient()
-    if amount_of_recovery < base_value * 100:
+    if 0 <= amount_of_recovery < base_value * 100:
         return base_value * 2 * coefficient
     elif base_value * 100 <= amount_of_recovery < base_value * 300:
         return base_value * 5 * coefficient
     elif amount_of_recovery >= base_value * 300:
         return base_value * 7 * coefficient
+    else:
+        raise ValueError('Amount of recovery (value) must be non-negative number.')
 
 
-def calculating_state_duty_for_administrative_case(fine, b_v):
-    if fine < b_v * 10:
+def calculating_state_duty_for_administrative_case(fine: float, b_v: float) -> float:
+    if 0 <= fine < b_v * 10:
         return base_value * 0.5
     elif b_v * 10 <= fine < b_v * 100:
         return base_value * 2
     elif fine >= b_v * 100:
         return base_value * 3
+    else:
+        raise ValueError('Fine (value) must be non-negative number.')
 
 
-def calculating_state_duty_for_get_documents(pages):
-    return base_value * 0.2 + pages * base_value * 0.03
+def calculating_state_duty_for_get_documents(pages: int) -> float:
+    if isinstance(pages, int) and pages >= 0:
+        return base_value * 0.2 + pages * base_value * 0.03
+    else:
+        raise ValueError('Pages (value) must be non-negative integer.')
 
 
 def raise_incorrect_value():

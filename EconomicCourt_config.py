@@ -1,5 +1,5 @@
 import logging
-import re
+# import re
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -11,7 +11,7 @@ from telegram.ext import (
     ConversationHandler
 )
 
-from dictionary_EconomicCourt import (
+from EconomicCourt_dictionary import (
     dict_instance,
     dict_proceeding,
     dict_adm_case,
@@ -21,13 +21,27 @@ from dictionary_EconomicCourt import (
     dict_court
 )
 
+from EconomicCourt_calculating_func import (
+    calculate_coefficient,
+    calculating_state_duty_for_property,
+    calculating_state_duty_for_order,
+    calculating_state_duty_for_administrative_case,
+    calculating_state_duty_for_get_documents
+)
+
+from Court_converting_func import (
+    converting_user_amount,
+    converting_user_fine,
+    converting_user_pages
+)
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-INSTANCE, PROCEEDING, OTHER, CLAIM, DUTY_PROPERTY, DUTY_ORDER = range(6)
-SUBJECT, COURT_1, COURT_2, ADM_CASE, DUTY_ADM_CASE, DUTY_DOCUMENTS = range(6, 12)
+(INSTANCE, PROCEEDING, OTHER, CLAIM, DUTY_PROPERTY, DUTY_ORDER, SUBJECT, COURT_1,
+ COURT_2, ADM_CASE, DUTY_ADM_CASE, DUTY_DOCUMENTS) = range(12)
 base_value = 32.0
 status_log = dict()
 
@@ -284,7 +298,7 @@ def define_price_of_claim(update, _):
                                                  f'"{dict_claim[status_log["claim"]]}"')
     logger.info(f"User {status_log['name']} has chosen nature of claim - {status_log['claim']}")
     print(status_log)
-    coefficient = calculate_coefficient()
+    coefficient = calculate_coefficient(status_log)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text('Укажите цену иска (оспариваемую сумму):')
     return DUTY_PROPERTY
@@ -338,7 +352,7 @@ def determine_size_of_state_duty_for_property_claim(update, _):
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         print(convert_claim_price)
-        state_duty = round(calculating_state_duty_for_property(convert_claim_price), 2)
+        state_duty = round(calculating_state_duty_for_property(convert_claim_price, base_value, status_log), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END
@@ -353,7 +367,7 @@ def determine_size_of_state_duty_for_order_claim(update, _):
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         print(convert_amount_of_recovery)
-        state_duty = round(calculating_state_duty_for_order(convert_amount_of_recovery), 2)
+        state_duty = round(calculating_state_duty_for_order(convert_amount_of_recovery, base_value, status_log), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END
@@ -371,7 +385,7 @@ def determine_size_of_state_duty_for_administrative_case(update, _):
             update.message.reply_text(raise_incorrect_value()[0])
             update.message.reply_text(raise_incorrect_value()[1])
         else:
-            state_duty = round(calculating_state_duty_for_administrative_case(convert_fine, convert_b_v), 2)
+            state_duty = round(calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, base_value), 2)
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                       parse_mode='HTML')
             return ConversationHandler.END
@@ -382,7 +396,7 @@ def determine_size_of_state_duty_for_administrative_case(update, _):
             update.message.reply_text(raise_incorrect_value()[0])
             update.message.reply_text(raise_incorrect_value()[1])
         else:
-            state_duty = round(calculating_state_duty_for_administrative_case(convert_fine, convert_b_v), 2)
+            state_duty = round(calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, base_value), 2)
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                       parse_mode='HTML')
             return ConversationHandler.END
@@ -400,7 +414,7 @@ def determine_size_of_state_duty_for_get_documents(update, _):
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         print(convert_pages)
-        state_duty = round(calculating_state_duty_for_get_documents(convert_pages), 2)
+        state_duty = round(calculating_state_duty_for_get_documents(convert_pages, base_value), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END
@@ -435,7 +449,7 @@ def determine_size_of_state_duty_x5(update, _):
                                                  f'"{dict_subject[status_log["subject"]]}"')
     print(status_log)
     logger.info(f"User {status_log['name']} has chosen subject - {status_log['subject']}")
-    coefficient = calculate_coefficient()
+    coefficient = calculate_coefficient(status_log)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -466,7 +480,7 @@ def determine_size_of_state_duty_x10(update, _):
         logger.info(f"User {status_log['name']} has chosen legal proceeding - {status_log['proceeding']}")
         update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
                                                      f'"{dict_proceeding[status_log["proceeding"]]}"')
-    coefficient = calculate_coefficient()
+    coefficient = calculate_coefficient(status_log)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -480,7 +494,7 @@ def determine_size_of_state_duty_x15(update, _):
                                                  f'"{dict_court[status_log["court"]]}"')
     print(status_log)
     logger.info(f"User {status_log['name']} has chosen a court - {status_log['court']}")
-    coefficient = calculate_coefficient()
+    coefficient = calculate_coefficient(status_log)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -493,7 +507,7 @@ def determine_size_of_state_duty_x20(update, _):
     update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
                                                  f'"{dict_court[status_log["court"]]}"')
     logger.info(f"User {status_log['name']} has chosen a court - {status_log['court']}")
-    coefficient = calculate_coefficient()
+    coefficient = calculate_coefficient(status_log)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -506,7 +520,7 @@ def determine_size_of_state_duty_x25(update, _):
     update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
                                                  f'"{dict_claim[status_log["claim"]]}"')
     logger.info(f"User {status_log['name']} has chosen nature of claim - {status_log['claim']}")
-    coefficient = calculate_coefficient()
+    coefficient = calculate_coefficient(status_log)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -519,7 +533,7 @@ def determine_size_of_state_duty_x50(update, _):
     update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
                                                  f'"{dict_court[status_log["court"]]}"')
     logger.info(f"User {status_log['name']} has chosen a court - {status_log['court']}")
-    coefficient = calculate_coefficient()
+    coefficient = calculate_coefficient(status_log)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -537,83 +551,6 @@ def determine_size_of_state_duty_for_newly_facts(update, _):
                                              ' дела по вновь открывшимся обстоятельствам\n'
                                              '(пп. 1.8.4 ст. 285 Налогового кодекса Республики Беларусь)')
     return ConversationHandler.END
-
-
-def converting_user_amount(amount: str) -> float:
-    amount = re.sub(',', '.', amount)
-    amount = re.sub(' ', '', amount)
-    data_type_check = re.search(r'^\d+\.*\d*$', amount)
-    if data_type_check:
-        if float(amount) >= 0:
-            return round(float(amount), 2)
-        raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
-    raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
-
-
-def converting_user_fine(fine: str) -> list:
-    return fine.split('=') if fine.count('=') == 1 else [fine]
-
-
-def converting_user_pages(number: str) -> int:
-    if number.isdigit() and int(number) >= 0:
-        return int(number)
-    else:
-        raise ValueError('Number (value) must be a string that can be converted to a non-negative integer.')
-
-
-def calculate_coefficient() -> float:
-    coefficient = 1.0
-    if 'instance' in status_log and status_log['instance'] in {'appeal', 'cassation', 'supervisory'}:
-        coefficient *= 0.8
-    if 'claim' in status_log and status_log['claim'] == 'quality_of_goods_claim':
-        coefficient *= 0.8
-    return coefficient
-
-
-def calculating_state_duty_for_property(claim_price: float) -> float:
-    coefficient = calculate_coefficient()
-    if 0 <= claim_price * 0.05 < base_value * 25:
-        return base_value * 25 * coefficient
-    elif claim_price * 0.05 >= base_value * 25 and claim_price < base_value * 1000:
-        return claim_price * 0.05 * coefficient
-    elif base_value * 1000 <= claim_price < base_value * 10000:
-        return base_value * 1000 * 0.05 + (claim_price - (base_value * 1000)) * 0.03 * coefficient
-    elif claim_price >= base_value * 10000:
-        if claim_price * 0.01 < base_value * 1000 * 0.05 + base_value * 9000 * 0.03:
-            return base_value * 1000 * 0.05 + base_value * 9000 * 0.03 * coefficient
-        return claim_price * 0.01 * coefficient
-    else:
-        raise ValueError('Claim price (value) must be non-negative number.')
-
-
-def calculating_state_duty_for_order(amount_of_recovery: float) -> float:
-    coefficient = calculate_coefficient()
-    if 0 <= amount_of_recovery < base_value * 100:
-        return base_value * 2 * coefficient
-    elif base_value * 100 <= amount_of_recovery < base_value * 300:
-        return base_value * 5 * coefficient
-    elif amount_of_recovery >= base_value * 300:
-        return base_value * 7 * coefficient
-    else:
-        raise ValueError('Amount of recovery (value) must be non-negative number.')
-
-
-def calculating_state_duty_for_administrative_case(fine: float, b_v: float) -> float:
-    if 0 <= fine < b_v * 10:
-        return base_value * 0.5
-    elif b_v * 10 <= fine < b_v * 100:
-        return base_value * 2
-    elif fine >= b_v * 100:
-        return base_value * 3
-    else:
-        raise ValueError('Fine (value) must be non-negative number.')
-
-
-def calculating_state_duty_for_get_documents(pages: int) -> float:
-    if isinstance(pages, int) and pages >= 0:
-        return base_value * 0.2 + pages * base_value * 0.03
-    else:
-        raise ValueError('Pages (value) must be non-negative integer.')
 
 
 def raise_incorrect_value():

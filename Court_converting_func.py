@@ -1,0 +1,23 @@
+import re
+
+
+def converting_user_amount(amount: str) -> float:
+    amount = re.sub(',', '.', amount)
+    amount = re.sub(' ', '', amount)
+    data_type_check = re.search(r'^\d+\.*\d*$', amount)
+    if data_type_check:
+        if float(amount) >= 0:
+            return round(float(amount), 2)
+        raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
+    raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
+
+
+def converting_user_fine(fine: str) -> list:
+    return fine.split('=') if fine.count('=') == 1 else [fine]
+
+
+def converting_user_pages(number: str) -> int:
+    if number.isdigit() and int(number) >= 0:
+        return int(number)
+    else:
+        raise ValueError('Number (value) must be a string that can be converted to a non-negative integer.')

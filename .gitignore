@@ -22,3 +22,6 @@ apps/bot/venv
 apps/bot/test
 apps/web/venv
 apps/web/vendor/*
+/code_archive/
+/status_log.db
+/user_id_for_test.py

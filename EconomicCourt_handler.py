@@ -1,4 +1,6 @@
-from code_archive.config_EconomicCourt_TEMP import *
+from telegram.ext import (MessageHandler, CallbackQueryHandler, Filters)
+
+from EconomicCourt_config import *
 
 from CSDB_index import (EC_INSTANCE, EC_PROCEEDING, EC_OTHER, EC_CLAIM, EC_DUTY_PROPERTY, EC_DUTY_ORDER, EC_SUBJECT,
                         EC_COURT_1, EC_COURT_2, EC_ADM_CASE, EC_DUTY_ADM_CASE, EC_DUTY_DOCUMENTS)

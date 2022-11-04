@@ -313,7 +313,7 @@ def choose_court(update, _):
         add_column_value(user_id, 'claim', claim)
         logger.info(f"User {user_id} has chosen nature of claimt - "
                     f"{dict_claim[get_column_value(user_id, 'claim')]}")
-        update.callback_query.edit_message_text(text=f"{len(status_log) - 1}. Вы выбрали:\n"
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                      f"{dict_claim[get_column_value(user_id, 'claim')]}")
         return EC_COURT_1
     else:

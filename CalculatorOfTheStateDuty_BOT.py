@@ -1,12 +1,12 @@
-from telegram.ext import (Updater, CommandHandler)
+from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler)
 
-from code_archive.config_EconomicCourt_TEMP import *
+from EconomicCourt_config import *
 
 from status_log_db.bot_status_log_db import *
 
 from EconomicCourt_handler import ec_conv_handler_dict
 
-from CSDB_index import *
+from CSDB_index import TYPE_COURT
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO

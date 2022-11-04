@@ -1,17 +1,9 @@
 import logging
-# import re
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import (
-    Updater,
-    CommandHandler,
-    CallbackQueryHandler,
-    MessageHandler,
-    Filters,
-    ConversationHandler
-)
+from telegram.ext import ConversationHandler
 
-from EconomicCourt_dictionary import (
+from selection_dictionaries.EconomicCourt_dictionary import (
     dict_instance,
     dict_proceeding,
     dict_adm_case,
@@ -20,6 +12,8 @@ from EconomicCourt_dictionary import (
     dict_subject,
     dict_court
 )
+
+from selection_dictionaries.Court_dictionary import dict_type_court
 
 from EconomicCourt_calculating_func import (
     calculate_coefficient,
@@ -35,19 +29,22 @@ from Court_converting_func import (
     converting_user_pages
 )
 
+from status_log_db.bot_status_log_db import *
+
+from CSDB_index import (EC_INSTANCE, EC_PROCEEDING, EC_OTHER, EC_CLAIM, EC_DUTY_PROPERTY, EC_DUTY_ORDER, EC_SUBJECT,
+                        EC_COURT_1, EC_COURT_2, EC_ADM_CASE, EC_DUTY_ADM_CASE, EC_DUTY_DOCUMENTS)
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-(INSTANCE, PROCEEDING, OTHER, CLAIM, DUTY_PROPERTY, DUTY_ORDER, SUBJECT, COURT_1,
- COURT_2, ADM_CASE, DUTY_ADM_CASE, DUTY_DOCUMENTS) = range(12)
 base_value = 32.0
-status_log = dict()
+
+status_log = {}
 
 
-def start(update, _):
-    status_log.clear()
+def choose_instance(update, _):
     keyboard = [
         [InlineKeyboardButton('Производство в суде первой инстанции', callback_data='first_instance')],
         [InlineKeyboardButton('Производство в суде апелляционной инстанции', callback_data='appeal')],
@@ -61,10 +58,16 @@ def start(update, _):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text('Выберите судебную инстанцию:', reply_markup=reply_markup)
-    status_log['name'] = update.message.from_user.first_name
-    logger.info(f"User {status_log['name']} started to choose some instance")
-    return INSTANCE
+    update.callback_query.message.reply_text('Выберите судебную инстанцию:', reply_markup=reply_markup)
+    user_id = update.callback_query.from_user.id
+    type_court = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'type_court', type_court)
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen the type of the court "
+                f"- {dict_type_court[get_column_value(user_id, 'type_court')]}")
+    update.callback_query.edit_message_text(text=f"Вы выбрали:\n{counter}. "
+                                                 f"{dict_type_court[get_column_value(user_id, 'type_court')]}")
+    return EC_INSTANCE
 
 
 def choose_type_of_legal_proceeding_1in(update, _):
@@ -95,12 +98,15 @@ def choose_type_of_legal_proceeding_1in(update, _):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.callback_query.message.reply_text('Выберите вид судопроизводства:', reply_markup=reply_markup)
-    status_log['instance'] = update.callback_query.data
-    logger.info(f"User {status_log['name']} has chosen instance - {status_log['instance']}")
-    print(status_log)
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_instance[status_log["instance"]]}"')
-    return PROCEEDING
+    user_id = update.callback_query.from_user.id
+    instance = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'instance', instance)
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen instance -"
+                f" {dict_instance[get_column_value(user_id, 'instance')]}")
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_instance[get_column_value(user_id, 'instance')]}")
+    return EC_PROCEEDING
 
 
 def choose_type_of_legal_proceeding_app(update, _):
@@ -129,12 +135,15 @@ def choose_type_of_legal_proceeding_app(update, _):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.callback_query.message.reply_text('Выберите вид судопроизводства:', reply_markup=reply_markup)
-    status_log['instance'] = update.callback_query.data
-    logger.info(f"User {status_log['name']} has chosen instance - {status_log['instance']}")
-    print(status_log)
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_instance[status_log["instance"]]}"')
-    return PROCEEDING
+    user_id = update.callback_query.from_user.id
+    instance = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'instance', instance)
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen instance -"
+                f" {dict_instance[get_column_value(user_id, 'instance')]}")
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_instance[get_column_value(user_id, 'instance')]}")
+    return EC_PROCEEDING
 
 
 def choose_type_of_legal_proceeding_cas_sup(update, _):
@@ -164,12 +173,15 @@ def choose_type_of_legal_proceeding_cas_sup(update, _):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.callback_query.message.reply_text('Выберите вид судопроизводства:', reply_markup=reply_markup)
-    status_log['instance'] = update.callback_query.data
-    logger.info(f"User {status_log['name']} has chosen instance - {status_log['instance']}")
-    print(status_log)
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_instance[status_log["instance"]]}"')
-    return PROCEEDING
+    user_id = update.callback_query.from_user.id
+    instance = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'instance', instance)
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen instance -"
+                f" {dict_instance[get_column_value(user_id, 'instance')]}")
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_instance[get_column_value(user_id, 'instance')]}")
+    return EC_PROCEEDING
 
 
 def choose_type_of_ruling_on_administrative_case(update, _):
@@ -182,12 +194,15 @@ def choose_type_of_ruling_on_administrative_case(update, _):
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.callback_query.message.reply_text('Выберите постановления по делу об административном правонарушении, '
                                              'которое обжалуется:', reply_markup=reply_markup)
-    status_log['instance'] = update.callback_query.data
-    logger.info(f"User {status_log['name']} has chosen instance - {status_log['instance']}")
-    print(status_log)
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_instance[status_log["instance"]]}"')
-    return ADM_CASE
+    user_id = update.callback_query.from_user.id
+    instance = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'instance', instance)
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen instance -"
+                f" {dict_instance[get_column_value(user_id, 'instance')]}")
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_instance[get_column_value(user_id, 'instance')]}")
+    return EC_ADM_CASE
 
 
 def choose_type_of_another_procedural_action(update, _):
@@ -197,12 +212,15 @@ def choose_type_of_another_procedural_action(update, _):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.callback_query.message.reply_text('Выберите иное процессуальное действие:', reply_markup=reply_markup)
-    status_log['instance'] = update.callback_query.data
-    logger.info(f"User {status_log['name']} has chosen instance - {status_log['instance']}")
-    print(status_log)
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_instance[status_log["instance"]]}"')
-    return OTHER
+    user_id = update.callback_query.from_user.id
+    instance = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'instance', instance)
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen instance -"
+                f" {dict_instance[get_column_value(user_id, 'instance')]}")
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_instance[get_column_value(user_id, 'instance')]}")
+    return EC_OTHER
 
 
 def choose_type_of_nature_of_claim(update, _):
@@ -219,12 +237,15 @@ def choose_type_of_nature_of_claim(update, _):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     update.callback_query.message.reply_text('Выберите характер требования (спора):', reply_markup=reply_markup)
-    status_log['proceeding'] = update.callback_query.data
-    logger.info(f"User {status_log['name']} has chosen legal proceeding - {status_log['proceeding']}")
-    print(status_log)
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_proceeding[status_log["proceeding"]]}"')
-    return CLAIM
+    user_id = update.callback_query.from_user.id
+    proceeding = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'proceeding', proceeding)
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen legal proceeding -"
+                f" {dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+    return EC_CLAIM
 
 
 def choose_subject(update, _):
@@ -238,18 +259,24 @@ def choose_subject(update, _):
 
     update.callback_query.message.reply_text('Выберите юридический статус лица, подающего исковое заявление '
                                              '(заявление, жалобу):', reply_markup=reply_markup)
-    if 'proceeding' in status_log:
-        status_log['claim'] = update.callback_query.data
-        logger.info(f"User {status_log['name']} has chosen nature of claim - {status_log['claim']}")
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_claim[status_log["claim"]]}"')
+    user_id = update.callback_query.from_user.id
+    counter = get_new_counter_value(user_id)
+
+    if get_column_value(user_id, 'proceeding'):
+        claim = update.callback_query.data
+        add_column_value(user_id, 'claim', claim)
+        logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen nature of claim - "
+                    f"{dict_claim[get_column_value(user_id, 'claim')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_claim[get_column_value(user_id, 'claim')]}")
     else:
-        status_log['proceeding'] = update.callback_query.data
-        logger.info(f"User {status_log['name']} has chosen legal proceeding - {status_log['proceeding']}")
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_proceeding[status_log["proceeding"]]}"')
-    print(status_log)
-    return SUBJECT
+        proceeding = update.callback_query.data
+        add_column_value(user_id, 'proceeding', proceeding)
+        logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen legal proceeding - "
+                    f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+    return EC_SUBJECT
 
 
 def choose_court(update, _):
@@ -262,65 +289,82 @@ def choose_court(update, _):
 
     update.callback_query.message.reply_text('Выберите суд, в который подаётся исковое заявление (заявление, жалоба):',
                                              reply_markup=reply_markup)
-    if 'claim' in status_log:
-        status_log['subject'] = update.callback_query.data
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_subject[status_log["subject"]]}"')
-        logger.info(f"User {status_log['name']} has chosen subject - {status_log['subject']}")
-        print(status_log)
-        return COURT_1
-    elif 'proceeding' in status_log and status_log['proceeding'] != 'lawsuit_proceeding':
-        status_log['subject'] = update.callback_query.data
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_subject[status_log["subject"]]}"')
-        logger.info(f"User {status_log['name']} has chosen subject - {status_log['subject']}")
-        print(status_log)
-        return COURT_1
-    elif 'proceeding' in status_log:
-        status_log['claim'] = update.callback_query.data
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_claim[status_log["claim"]]}"')
-        logger.info(f"User {status_log['name']} has chosen nature of claim - {status_log['claim']}")
-        print(status_log)
-        return COURT_1
+    user_id = update.callback_query.from_user.id
+    counter = get_new_counter_value(user_id)
+
+    if get_column_value(user_id, 'claim'):
+        subject = update.callback_query.data
+        add_column_value(user_id, 'subject', subject)
+        logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen subject - "
+                    f"{dict_subject[get_column_value(user_id, 'subject')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_subject[get_column_value(user_id, 'subject')]}")
+        return EC_COURT_1
+    elif get_column_value(user_id, 'proceeding') and get_column_value(user_id, 'proceeding') != 'lawsuit_proceeding':
+        subject = update.callback_query.data
+        add_column_value(user_id, 'subject', subject)
+        logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen subject - "
+                    f"{dict_subject[get_column_value(user_id, 'subject')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_subject[get_column_value(user_id, 'subject')]}")
+        return EC_COURT_1
+    elif get_column_value(user_id, 'proceeding'):
+        claim = update.callback_query.data
+        add_column_value(user_id, 'claim', claim)
+        logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen nature of claimt - "
+                    f"{dict_claim[get_column_value(user_id, 'claim')]}")
+        update.callback_query.edit_message_text(text=f"{len(status_log) - 1}. Вы выбрали:\n"
+                                                     f"{dict_claim[get_column_value(user_id, 'claim')]}")
+        return EC_COURT_1
     else:
-        status_log['proceeding'] = update.callback_query.data
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_proceeding[status_log["proceeding"]]}"')
-        logger.info(f"User {status_log['name']} has chosen nature of claim - {status_log['proceeding']}")
-        print(status_log)
-        return COURT_2
+        proceeding = update.callback_query.data
+        add_column_value(user_id, 'proceeding', proceeding)
+        logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen proceeding - "
+                    f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+        return EC_COURT_2
 
 
 def define_price_of_claim(update, _):
-    status_log['claim'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_claim[status_log["claim"]]}"')
-    logger.info(f"User {status_log['name']} has chosen nature of claim - {status_log['claim']}")
-    print(status_log)
-    coefficient = calculate_coefficient(status_log)
+    user_id = update.callback_query.from_user.id
+    claim = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'claim', claim)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_claim[get_column_value(user_id, 'claim')]}")
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen nature of claim - "
+                f"{dict_claim[get_column_value(user_id, 'claim')]}")
+
+    coefficient = calculate_coefficient(
+        user_id)  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ОН ЖЕ ЕСТЬ В ФОРМУЛЕ НАФИГА ОН ЕЩЁ И ЗДЕСЬ??????
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text('Укажите цену иска (оспариваемую сумму):')
-    return DUTY_PROPERTY
+    return EC_DUTY_PROPERTY
 
 
 def define_amount_for_order_proceeding(update, _):
-    status_log['proceeding'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_proceeding[status_log["proceeding"]]}"')
-    print(status_log)
-    logger.info(f"User {status_log['name']} has chosen legal proceeding - {status_log['proceeding']}")
+    user_id = update.callback_query.from_user.id
+    proceeding = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'proceeding', proceeding)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen legal proceeding - "
+                f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
     update.callback_query.message.reply_text('Укажите сумму взыскания:')
-    return DUTY_ORDER
+    return EC_DUTY_ORDER
 
 
 def define_fine(update, _):
-    status_log['ruling_on_adm'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_adm_case[status_log["ruling_on_adm"]]}"')
-    print(status_log)
-    logger.info(f"User {status_log['name']} has chosen type of a ruling on an administrative case"
-                f" - {status_log['ruling_on_adm']}")
+    user_id = update.callback_query.from_user.id
+    ruling_on_adm = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'ruling_on_adm', ruling_on_adm)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen type of a ruling on an administrative case"
+                f" - {dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
     update.callback_query.message.reply_text('Укажите размер штрафа.\n\n\n'
                                              '<i>В случае, если на день расчёта государственной пошлины установлен иной'
                                              ' размер базовой величины, по сравнению с тем, который существовал на день'
@@ -330,51 +374,55 @@ def define_fine(update, _):
                                              '</b></i>\n\n'
                                              'Если размер базовой величины не изменялся,'
                                              'достаточно указать только размер штрафа:', parse_mode='HTML')
-    return DUTY_ADM_CASE
+    return EC_DUTY_ADM_CASE
 
 
 def define_number_of_documents(update, _):
-    status_log['another_action'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_other[status_log["another_action"]]}"')
-    print(status_log)
-    logger.info(f"User {status_log['name']} has chosen another procedural action - {status_log['another_action']}")
+    user_id = update.callback_query.from_user.id
+    another_action = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'another_action', another_action)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_other[get_column_value(user_id, 'another_action')]}")
+    logger.info(f"User {get_column_value(user_id, 'user_id')} has chosen another procedural action - "
+                f"{dict_other[get_column_value(user_id, 'another_action')]}")
     update.callback_query.message.reply_text('Укажите количество страниц документа(ов), подлежащих изготовлению:')
-    return DUTY_DOCUMENTS
+    return EC_DUTY_DOCUMENTS
 
 
 def determine_size_of_state_duty_for_property_claim(update, _):
-    logger.info(f"User {status_log['name']} has specified the price of the claim - {update.message.text}")
+    user_id = update.message.from_user.id
+    logger.info(f"User {user_id} has specified the price of the claim - {update.message.text}")
     try:
         convert_claim_price = converting_user_amount(str(update.message.text))
     except ValueError:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
     else:
-        print(convert_claim_price)
-        state_duty = round(calculating_state_duty_for_property(convert_claim_price, base_value, status_log), 2)
+        state_duty = round(calculating_state_duty_for_property(convert_claim_price, base_value, user_id), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END
 
 
 def determine_size_of_state_duty_for_order_claim(update, _):
-    logger.info(f"User {status_log['name']} has specified amount of recovery - {update.message.text}")
+    user_id = update.message.from_user.id
+    logger.info(f"User {user_id} has specified amount of recovery - {update.message.text}")
     try:
         convert_amount_of_recovery = converting_user_amount(str(update.message.text))
     except ValueError:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
     else:
-        print(convert_amount_of_recovery)
-        state_duty = round(calculating_state_duty_for_order(convert_amount_of_recovery, base_value, status_log), 2)
+        state_duty = round(calculating_state_duty_for_order(convert_amount_of_recovery, base_value, user_id), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END
 
 
 def determine_size_of_state_duty_for_administrative_case(update, _):
-    logger.info(f"User {status_log['name']} has specified the size of fine - {update.message.text}")
+    user_id = update.message.from_user.id
+    logger.info(f"User {user_id} has specified the size of fine - {update.message.text}")
     convert_b_v = base_value
     str_to_list_fine = converting_user_fine(str(update.message.text))
     if len(str_to_list_fine) == 2:
@@ -406,14 +454,14 @@ def determine_size_of_state_duty_for_administrative_case(update, _):
 
 
 def determine_size_of_state_duty_for_get_documents(update, _):
-    logger.info(f"User {status_log['name']} has specified the number of pages - {update.message.text}")
+    user_id = update.message.from_user.id
+    logger.info(f"User {user_id} has specified the number of pages - {update.message.text}")
     try:
         convert_pages = converting_user_pages(str(update.message.text))
     except ValueError:
         update.message.reply_text('Значение количества страниц должно быть целым неотрицательным числом')
         update.message.reply_text(raise_incorrect_value()[1])
     else:
-        print(convert_pages)
         state_duty = round(calculating_state_duty_for_get_documents(convert_pages, base_value), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
@@ -421,35 +469,42 @@ def determine_size_of_state_duty_for_get_documents(update, _):
 
 
 def determine_size_of_state_duty_x05(update, _):
-    status_log['another_action'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_other[status_log["another_action"]]}"')
-    print(status_log)
-    logger.info(f"User {status_log['name']} has chosen another procedural action - {status_log['another_action']}")
+    user_id = update.callback_query.from_user.id
+    another_action = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'another_action', another_action)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_other[get_column_value(user_id, 'another_action')]}")
+    logger.info(f"User {user_id} has chosen another procedural action - "
+                f"{dict_other[get_column_value(user_id, 'another_action')]}")
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{base_value * 0.5}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
 
 
 def determine_size_of_state_duty_x1(update, _):
-    status_log['ruling_on_adm'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_adm_case[status_log["ruling_on_adm"]]}"')
-    print(status_log)
-    logger.info(f"User {status_log['name']} has chosen type of a ruling on an administrative case"
-                f" - {status_log['ruling_on_adm']}"),
+    user_id = update.callback_query.from_user.id
+    ruling_on_adm = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'ruling_on_adm', ruling_on_adm)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
+    logger.info(f"User {user_id} has chosen type of a ruling on an administrative case"
+                f" - {dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}"),
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{base_value * 1}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
 
 
 def determine_size_of_state_duty_x5(update, _):
-    status_log['subject'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_subject[status_log["subject"]]}"')
-    print(status_log)
-    logger.info(f"User {status_log['name']} has chosen subject - {status_log['subject']}")
-    coefficient = calculate_coefficient(status_log)
+    user_id = update.callback_query.from_user.id
+    subject = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'subject', subject)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_subject[get_column_value(user_id, 'subject')]}")
+    logger.info(f"User {user_id} has chosen subject - {dict_subject[get_column_value(user_id, 'subject')]}")
+    coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -458,29 +513,36 @@ def determine_size_of_state_duty_x5(update, _):
 
 
 def determine_size_of_state_duty_x10(update, _):
-    if 'claim' in status_log:
-        status_log['subject'] = update.callback_query.data
-        logger.info(f"User {status_log['name']} has chosen subject - {status_log['subject']}")
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_subject[status_log["subject"]]}"')
-    elif 'proceeding' in status_log and status_log['proceeding'] in {
+    user_id = update.callback_query.from_user.id
+    counter = get_new_counter_value(user_id)
+    if get_column_value(user_id, 'claim'):
+        subject = update.callback_query.data
+        add_column_value(user_id, 'subject', subject)
+        logger.info(f"User {user_id} has chosen subject - {dict_subject[get_column_value(user_id, 'subject')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_subject[get_column_value(user_id, 'subject')]}")
+    elif get_column_value(user_id, 'proceeding') and get_column_value(user_id, 'proceeding') in {
         'appeal_NNLA_proceeding', 'administrative_proceeding', 'appeal_claim_proceeding', 'appeal_bailiff_proceeding'
     }:
-        status_log['subject'] = update.callback_query.data
-        logger.info(f"User {status_log['name']} has chosen subject - {status_log['subject']}")
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_subject[status_log["subject"]]}"')
-    elif 'proceeding' in status_log and status_log['proceeding'] == 'special_proceeding':
-        status_log['court'] = update.callback_query.data
-        logger.info(f"User {status_log['name']} has chosen a court - {status_log['court']}")
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_court[status_log["court"]]}"')
+        subject = update.callback_query.data
+        add_column_value(user_id, 'subject', subject)
+        logger.info(f"User {user_id} has chosen subject - {dict_subject[get_column_value(user_id, 'subject')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_subject[get_column_value(user_id, 'subject')]}")
+    elif get_column_value(user_id, 'proceeding') and get_column_value(user_id, 'proceeding') == 'special_proceeding':
+        court = update.callback_query.data
+        add_column_value(user_id, 'court', court)
+        logger.info(f"User {user_id} has chosen a court - {dict_court[get_column_value(user_id, 'court')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_court[get_column_value(user_id, 'court')]}")
     else:
-        status_log['proceeding'] = update.callback_query.data
-        logger.info(f"User {status_log['name']} has chosen legal proceeding - {status_log['proceeding']}")
-        update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                     f'"{dict_proceeding[status_log["proceeding"]]}"')
-    coefficient = calculate_coefficient(status_log)
+        proceeding = update.callback_query.data
+        add_column_value(user_id, 'proceeding', proceeding)
+        logger.info(f"User {user_id} has chosen legal proceeding - "
+                    f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+        update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                     f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+    coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -489,12 +551,14 @@ def determine_size_of_state_duty_x10(update, _):
 
 
 def determine_size_of_state_duty_x15(update, _):
-    status_log['court'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_court[status_log["court"]]}"')
-    print(status_log)
-    logger.info(f"User {status_log['name']} has chosen a court - {status_log['court']}")
-    coefficient = calculate_coefficient(status_log)
+    user_id = update.callback_query.from_user.id
+    court = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'court', court)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_court[get_column_value(user_id, 'court')]}")
+    logger.info(f"User {user_id} has chosen a court - {dict_court[get_column_value(user_id, 'court')]}")
+    coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -503,11 +567,14 @@ def determine_size_of_state_duty_x15(update, _):
 
 
 def determine_size_of_state_duty_x20(update, _):
-    status_log['court'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_court[status_log["court"]]}"')
-    logger.info(f"User {status_log['name']} has chosen a court - {status_log['court']}")
-    coefficient = calculate_coefficient(status_log)
+    user_id = update.callback_query.from_user.id
+    court = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'court', court)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_court[get_column_value(user_id, 'court')]}")
+    logger.info(f"User {user_id} has chosen a court - {dict_court[get_column_value(user_id, 'court')]}")
+    coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -516,11 +583,14 @@ def determine_size_of_state_duty_x20(update, _):
 
 
 def determine_size_of_state_duty_x25(update, _):
-    status_log['claim'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_claim[status_log["claim"]]}"')
-    logger.info(f"User {status_log['name']} has chosen nature of claim - {status_log['claim']}")
-    coefficient = calculate_coefficient(status_log)
+    user_id = update.callback_query.from_user.id
+    claim = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'claim', claim)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_claim[get_column_value(user_id, 'claim')]}")
+    logger.info(f"User {user_id} has chosen nature of claim - {dict_claim[get_column_value(user_id, 'claim')]}")
+    coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -529,11 +599,14 @@ def determine_size_of_state_duty_x25(update, _):
 
 
 def determine_size_of_state_duty_x50(update, _):
-    status_log['court'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_court[status_log["court"]]}"')
-    logger.info(f"User {status_log['name']} has chosen a court - {status_log['court']}")
-    coefficient = calculate_coefficient(status_log)
+    user_id = update.callback_query.from_user.id
+    court = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'court', court)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_court[get_column_value(user_id, 'court')]}")
+    logger.info(f"User {user_id} has chosen a court - {dict_court[get_column_value(user_id, 'court')]}")
+    coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
@@ -542,10 +615,13 @@ def determine_size_of_state_duty_x50(update, _):
 
 
 def determine_size_of_state_duty_for_newly_facts(update, _):
-    status_log['instance'] = update.callback_query.data
-    update.callback_query.edit_message_text(text=f'{len(status_log) - 1}. Вы выбрали:\n'
-                                                 f'"{dict_instance[status_log["instance"]]}"')
-    logger.info(f"User {status_log['name']} has chosen an instance - {status_log['instance']}")
+    user_id = update.callback_query.from_user.id
+    instance = update.callback_query.data
+    counter = get_new_counter_value(user_id)
+    add_column_value(user_id, 'instance', instance)
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
+                                                 f"{dict_instance[get_column_value(user_id, 'instance')]}")
+    logger.info(f"User {user_id} has chosen an instance - {dict_instance[get_column_value(user_id, 'instance')]}")
     update.callback_query.message.reply_text('Освобождаются от государственной пошлины при обращении в суд организации '
                                              'и физические лица за рассмотрение  заявления о пересмотре (возобновлении)'
                                              ' дела по вновь открывшимся обстоятельствам\n'
@@ -559,98 +635,3 @@ def raise_incorrect_value():
         '1111 (для целочисленных значений)\nили\n1111.11 (для вещественных значений)',
         'Повторно введите значение:'
     )
-
-
-def cancel(update, _):
-    user = update.message.from_user
-    logger.info(f'User {user.first_name} has canceled process')
-    update.message.reply_text(
-        'Действие работы бота прервано.\nДля возобновления работы введите /start'
-    )
-    return ConversationHandler.END
-
-
-def main():
-    updater = Updater("5675091266:AAHbP-X6DxIrQ5FqXwkn9Nt03ayzA74CP1Y")
-    dispatcher = updater.dispatcher
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={
-            INSTANCE: [
-                CallbackQueryHandler(choose_type_of_legal_proceeding_1in, pattern="^" + 'first_instance' + "$"),
-                CallbackQueryHandler(choose_type_of_legal_proceeding_app, pattern="^" + 'appeal' + "$"),
-                CallbackQueryHandler(choose_type_of_legal_proceeding_cas_sup, pattern="^" + 'cassation' + "$"),
-                CallbackQueryHandler(choose_type_of_legal_proceeding_cas_sup, pattern="^" + 'supervisory' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_for_newly_facts, pattern="^" + 'newly_facts' + "$"),
-                CallbackQueryHandler(choose_type_of_ruling_on_administrative_case,
-                                     pattern="^" + 'administrative_appeal' + "$"),
-                CallbackQueryHandler(choose_type_of_another_procedural_action, pattern="^" + 'other' + "$")
-            ],
-            PROCEEDING: [
-                CallbackQueryHandler(choose_type_of_nature_of_claim, pattern="^" + 'lawsuit_proceeding' + "$"),
-                CallbackQueryHandler(define_amount_for_order_proceeding, pattern="^" + 'order_proceeding' + "$"),
-                CallbackQueryHandler(choose_subject, pattern="^" + 'appeal_NNLA_proceeding' + "$"),
-                CallbackQueryHandler(choose_court, pattern="^" + 'special_proceeding' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x10, pattern="^" + 'bankrupt_proceeding' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x10,
-                                     pattern="^" + 'appeal_notarial_proceeding' + "$"),
-                CallbackQueryHandler(choose_subject, pattern="^" + 'administrative_proceeding' + "$"),
-                CallbackQueryHandler(choose_subject, pattern="^" + 'appeal_claim_proceeding' + "$"),
-                CallbackQueryHandler(choose_subject, pattern="^" + 'appeal_bailiff_proceeding' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x10,
-                                     pattern="^" + 'acknowledge_proceeding' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x10,
-                                     pattern="^" + 'executive_doc_proceeding' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x10,
-                                     pattern="^" + 'securing_proceeding' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x10,
-                                     pattern="^" + 'appeal_arbitration_proceeding' + "$"),
-            ],
-            ADM_CASE: [
-                CallbackQueryHandler(define_fine, pattern="^" + 'fine' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x1, pattern="^" + 'other_penalty' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x1, pattern="^" + 'non_penalty' + "$")
-            ],
-            OTHER: [
-                CallbackQueryHandler(determine_size_of_state_duty_x05, pattern="^" + 'another_complaint' + "$"),
-                CallbackQueryHandler(define_number_of_documents, pattern="^" + 'get_documents' + "$"),
-            ],
-            CLAIM: [
-                CallbackQueryHandler(define_price_of_claim, pattern="^" + 'property_claim' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x25,
-                                     pattern="^" + 'subsidiary_liability_claim' + "$"),
-                CallbackQueryHandler(define_price_of_claim, pattern="^" + 'quality_of_goods_claim' + "$"),
-                CallbackQueryHandler(choose_subject, pattern="^" + 'non-pecuniary_claim' + "$"),
-                CallbackQueryHandler(choose_court, pattern="^" + 'contract_dispute_claim' + "$")
-            ],
-            SUBJECT: [
-                CallbackQueryHandler(choose_court, pattern="^" + 'entity' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x10, pattern="^" + 'individual_entrepreneur' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x5, pattern="^" + 'individual' + "$")
-            ],
-            COURT_1: [
-                CallbackQueryHandler(determine_size_of_state_duty_x50, pattern="^" + 'supreme_court' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x20, pattern="^" + 'regional_court' + "$"),
-            ],
-            COURT_2: [
-                CallbackQueryHandler(determine_size_of_state_duty_x15, pattern="^" + 'supreme_court' + "$"),
-                CallbackQueryHandler(determine_size_of_state_duty_x10, pattern="^" + 'regional_court' + "$"),
-            ],
-            DUTY_PROPERTY: [
-                MessageHandler(Filters.text & ~Filters.command, determine_size_of_state_duty_for_property_claim)],
-            DUTY_ORDER: [MessageHandler(Filters.text & ~Filters.command, determine_size_of_state_duty_for_order_claim)],
-            DUTY_ADM_CASE: [
-                MessageHandler(Filters.text & ~Filters.command, determine_size_of_state_duty_for_administrative_case)],
-            DUTY_DOCUMENTS: [
-                MessageHandler(Filters.text & ~Filters.command, determine_size_of_state_duty_for_get_documents)]
-        },
-        fallbacks=[CommandHandler('cancel', cancel)]
-    )
-    dispatcher.add_handler(conv_handler)
-
-    updater.start_polling()
-    updater.idle()
-
-
-if __name__ == '__main__':
-    main()

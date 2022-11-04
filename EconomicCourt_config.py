@@ -38,22 +38,20 @@ from status_log_db.bot_status_log_db import (
 from CSDB_index import (EC_INSTANCE, EC_PROCEEDING, EC_OTHER, EC_CLAIM, EC_DUTY_PROPERTY, EC_DUTY_ORDER, EC_SUBJECT,
                         EC_COURT_1, EC_COURT_2, EC_ADM_CASE, EC_DUTY_ADM_CASE, EC_DUTY_DOCUMENTS)
 
+from BaseValue.base_value import base_value
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 logger = logging.getLogger(__name__)
 
-base_value = 32.0
-
-status_log = {}
-
 
 def choose_instance(update, _):
     keyboard = [
-        [InlineKeyboardButton('Производство в суде первой инстанции', callback_data='first_instance')],
-        [InlineKeyboardButton('Производство в суде апелляционной инстанции', callback_data='appeal')],
-        [InlineKeyboardButton('Производство в суде кассационной инстанции', callback_data='cassation')],
-        [InlineKeyboardButton('Производство по пересмотру судебных постановлений в порядке надзора',
+        [InlineKeyboardButton('Первая инстанция', callback_data='first_instance')],
+        [InlineKeyboardButton('Апелляционная инстанция', callback_data='appeal')],
+        [InlineKeyboardButton('Кассационная инстанция', callback_data='cassation')],
+        [InlineKeyboardButton('Производство в порядке надзора',
                               callback_data='supervisory')],
         [InlineKeyboardButton('Производство по вновь открывшимся обстоятельствам', callback_data='newly_facts')],
         [InlineKeyboardButton('Обжалование постановления по делу об административном правонарушении',
@@ -62,7 +60,8 @@ def choose_instance(update, _):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text('Выберите судебную инстанцию:', reply_markup=reply_markup)
+    update.callback_query.message.reply_text('Выберите судебную инстанцию или иное производство (действие):',
+                                             reply_markup=reply_markup)
     user_id = update.callback_query.from_user.id
     type_court = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -291,7 +290,8 @@ def choose_court(update, _):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text('Выберите суд, в который подаётся исковое заявление (заявление, жалоба):',
+    update.callback_query.message.reply_text('Выберите суд, в который подаётся(-валось) исковое заявление '
+                                             '(заявление, жалоба) для рассмотрения по существу (суд первой инстанции):',
                                              reply_markup=reply_markup)
     user_id = update.callback_query.from_user.id
     counter = get_new_counter_value(user_id)
@@ -418,7 +418,7 @@ def determine_size_of_state_duty_for_order_claim(update, _):
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
     else:
-        state_duty = round(calculating_state_duty_for_order(convert_amount_of_recovery, base_value, user_id), 2)
+        state_duty = round(calculating_state_duty_for_order(convert_amount_of_recovery, base_value), 2)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END

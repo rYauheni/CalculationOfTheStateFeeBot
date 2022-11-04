@@ -44,7 +44,7 @@ class TestCalculatingFunctions(unittest.TestCase):
         expected_result = [64, 64, 160, 160, 160, 160, 224, 224, 224]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_order(el, base_value, user_id), 2)
+            el_res = round(calculating_state_duty_for_order(el, base_value), 2)
             actual_result.append(el_res)
         self.assertEqual(expected_result, actual_result)
 
@@ -52,9 +52,9 @@ class TestCalculatingFunctions(unittest.TestCase):
         input_data_ve = [-0.00001, -1, -10000]
         input_data_te = ['', 'abc', '.', '100', '0', [], (), {}]
         for el in input_data_ve:
-            self.assertRaises(ValueError, calculating_state_duty_for_order, el, base_value, user_id)
+            self.assertRaises(ValueError, calculating_state_duty_for_order, el, base_value)
         for el in input_data_te:
-            self.assertRaises(TypeError, calculating_state_duty_for_order, el, base_value, user_id)
+            self.assertRaises(TypeError, calculating_state_duty_for_order, el, base_value)
 
     def test_calculating_state_duty_for_administrative_case_32(self):
         input_data = [0, 319.99, 320, 320.01, 1111.11, 3199.99, 3200, 3200.01, 888888.88]

@@ -369,9 +369,10 @@ def define_fine(update, _):
                                                  f"{dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
     logger.info(f"User {user_id} has chosen type of a ruling on an administrative case"
                 f" - {dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
-    update.callback_query.message.reply_text('Укажите размер штрафа.\n\n\n'
+    update.callback_query.message.reply_text(f'Укажите размер штрафа.\n\n\n'
                                              '<i>В случае, если на день расчёта государственной пошлины установлен иной'
-                                             ' размер базовой величины, по сравнению с тем, который существовал на день'
+                                             f' размер базовой величины ({base_value} BYN), по сравнению с тем, который'
+                                             f' существовал на день'
                                              ' наложения административного взыскания в виде штрафа, дполнительно '
                                              'укажите размер базовой величины, существовавшей на день наложения '
                                              'взыскания в формате:\n\n <b>штраф=базовая_величина (например, 290=29)'

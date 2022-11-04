@@ -1,8 +1,16 @@
-from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler)
+import logging
 
-from EconomicCourt_config import *
+from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 
-from status_log_db.bot_status_log_db import *
+from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler, ConversationHandler)
+
+from EconomicCourt_config import choose_instance
+
+from status_log_db.bot_status_log_db import (
+    create_table,
+    add_new_raw,
+    add_column_value
+)
 
 from EconomicCourt_handler import ec_conv_handler_dict
 

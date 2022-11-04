@@ -29,7 +29,11 @@ from Court_converting_func import (
     converting_user_pages
 )
 
-from status_log_db.bot_status_log_db import *
+from status_log_db.bot_status_log_db import (
+    get_column_value,
+    add_column_value,
+    get_new_counter_value
+)
 
 from CSDB_index import (EC_INSTANCE, EC_PROCEEDING, EC_OTHER, EC_CLAIM, EC_DUTY_PROPERTY, EC_DUTY_ORDER, EC_SUBJECT,
                         EC_COURT_1, EC_COURT_2, EC_ADM_CASE, EC_DUTY_ADM_CASE, EC_DUTY_DOCUMENTS)

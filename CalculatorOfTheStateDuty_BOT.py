@@ -31,7 +31,7 @@ def start(update, _):
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text('Выберите судебную инстанцию:', reply_markup=reply_markup)
+    update.message.reply_text('Выберите судебную юрисдикцию:', reply_markup=reply_markup)
     user_name = update.message.from_user.first_name
     user_id = update.message.from_user.id
     print(user_id)

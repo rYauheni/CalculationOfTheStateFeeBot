@@ -1,4 +1,4 @@
-from status_log_db.bot_status_log_db import *
+from status_log_db.bot_status_log_db import get_column_value
 
 
 def calculate_coefficient(user_id: int) -> float:
@@ -27,14 +27,14 @@ def calculating_state_duty_for_property(claim_price: float, base_value: float, u
         raise ValueError('Claim price (value) must be non-negative number.')
 
 
-def calculating_state_duty_for_order(amount_of_recovery: float, base_value: float, user_id: int) -> float:
-    coefficient = calculate_coefficient(user_id)  # НУЖЕН ЛИ ТУТ ВООБЩЕ КОЭФФИЦИЕНТ ????????????????????????????????????????????????????
+def calculating_state_duty_for_order(amount_of_recovery: float, base_value: float) -> float:
+    # del coefficient
     if 0 <= amount_of_recovery < base_value * 100:
-        return base_value * 2 * coefficient
+        return base_value * 2
     elif base_value * 100 <= amount_of_recovery < base_value * 300:
-        return base_value * 5 * coefficient
+        return base_value * 5
     elif amount_of_recovery >= base_value * 300:
-        return base_value * 7 * coefficient
+        return base_value * 7
     else:
         raise ValueError('Amount of recovery (value) must be non-negative number.')
 

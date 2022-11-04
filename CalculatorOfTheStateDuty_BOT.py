@@ -32,7 +32,7 @@ def start(update, _):
     add_column_value(user_id, 'user_name', user_name)
     add_column_value(user_id, 'counter', '0')
 
-    logger.info(f"User {get_column_value(user_id, 'user_id')} started to choose some instance")
+    logger.info(f"User {user_id} started to choose some instance")
     return TYPE_COURT
 
 

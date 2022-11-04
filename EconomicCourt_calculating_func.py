@@ -1,16 +1,18 @@
+from status_log_db.bot_status_log_db import *
 
 
-def calculate_coefficient(status_log: dict) -> float:
+def calculate_coefficient(user_id: int) -> float:
     coefficient = 1.0
-    if 'instance' in status_log and status_log['instance'] in {'appeal', 'cassation', 'supervisory'}:
+    if get_column_value(user_id, 'instance') and \
+            get_column_value(user_id, 'instance') in {'appeal', 'cassation', 'supervisory'}:
         coefficient *= 0.8
-    if 'claim' in status_log and status_log['claim'] == 'quality_of_goods_claim':
+    if get_column_value(user_id, 'claim') and get_column_value(user_id, 'claim') == 'quality_of_goods_claim':
         coefficient *= 0.8
     return coefficient
 
 
-def calculating_state_duty_for_property(claim_price: float, base_value: float, status_log: dict) -> float:
-    coefficient = calculate_coefficient(status_log)
+def calculating_state_duty_for_property(claim_price: float, base_value: float, user_id: int) -> float:
+    coefficient = calculate_coefficient(user_id)
     if 0 <= claim_price * 0.05 < base_value * 25:
         return base_value * 25 * coefficient
     elif claim_price * 0.05 >= base_value * 25 and claim_price < base_value * 1000:
@@ -25,8 +27,8 @@ def calculating_state_duty_for_property(claim_price: float, base_value: float, s
         raise ValueError('Claim price (value) must be non-negative number.')
 
 
-def calculating_state_duty_for_order(amount_of_recovery: float, base_value: float, status_log: dict) -> float:
-    coefficient = calculate_coefficient(status_log)
+def calculating_state_duty_for_order(amount_of_recovery: float, base_value: float, user_id: int) -> float:
+    coefficient = calculate_coefficient(user_id)  # НУЖЕН ЛИ ТУТ ВООБЩЕ КОЭФФИЦИЕНТ ????????????????????????????????????????????????????
     if 0 <= amount_of_recovery < base_value * 100:
         return base_value * 2 * coefficient
     elif base_value * 100 <= amount_of_recovery < base_value * 300:

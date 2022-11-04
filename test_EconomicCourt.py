@@ -1,14 +1,21 @@
 import unittest
 
-from config_EconomicCourt import (
+from EconomicCourt_calculating_func import (
     calculating_state_duty_for_property,
     calculating_state_duty_for_order,
     calculating_state_duty_for_administrative_case,
-    calculating_state_duty_for_get_documents,
+    calculating_state_duty_for_get_documents
+)
+
+from Court_converting_func import (
     converting_user_amount,
     converting_user_fine,
     converting_user_pages
 )
+
+from user_id_for_test import user_id
+
+base_value = 32.0
 
 
 class TestCalculatingFunctions(unittest.TestCase):
@@ -20,7 +27,7 @@ class TestCalculatingFunctions(unittest.TestCase):
                            10240, 10240, 10240, 10240, 10240, 10240, 10240.01, 55555.56]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_property(el), 2)
+            el_res = round(calculating_state_duty_for_property(el, base_value, user_id), 2)
             actual_result.append(el_res)
         self.assertEqual(expected_result, actual_result)
 
@@ -28,16 +35,16 @@ class TestCalculatingFunctions(unittest.TestCase):
         input_data_ve = [-0.0001, -1, -10000]
         input_data_te = ['', 'abc', '.', '100', '0', [], (), {}]
         for el in input_data_ve:
-            self.assertRaises(ValueError, calculating_state_duty_for_property, el)
+            self.assertRaises(ValueError, calculating_state_duty_for_property, el, base_value, user_id)
         for el in input_data_te:
-            self.assertRaises(TypeError, calculating_state_duty_for_property, el)
+            self.assertRaises(TypeError, calculating_state_duty_for_property, el, base_value, user_id)
 
     def test_calculating_state_duty_for_order(self):
         input_data = [0, 3199.92, 3200, 3200.01, 5555.55, 9599.97, 9600, 9600.01, 1000000]
         expected_result = [64, 64, 160, 160, 160, 160, 224, 224, 224]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_order(el), 2)
+            el_res = round(calculating_state_duty_for_order(el, base_value, user_id), 2)
             actual_result.append(el_res)
         self.assertEqual(expected_result, actual_result)
 
@@ -45,16 +52,16 @@ class TestCalculatingFunctions(unittest.TestCase):
         input_data_ve = [-0.00001, -1, -10000]
         input_data_te = ['', 'abc', '.', '100', '0', [], (), {}]
         for el in input_data_ve:
-            self.assertRaises(ValueError, calculating_state_duty_for_order, el)
+            self.assertRaises(ValueError, calculating_state_duty_for_order, el, base_value, user_id)
         for el in input_data_te:
-            self.assertRaises(TypeError, calculating_state_duty_for_order, el)
+            self.assertRaises(TypeError, calculating_state_duty_for_order, el, base_value, user_id)
 
     def test_calculating_state_duty_for_administrative_case_32(self):
         input_data = [0, 319.99, 320, 320.01, 1111.11, 3199.99, 3200, 3200.01, 888888.88]
         expected_result = [16, 16, 64, 64, 64, 64, 96, 96, 96]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_administrative_case(el, 32), 2)
+            el_res = round(calculating_state_duty_for_administrative_case(el, 32, base_value), 2)
             actual_result.append(el_res)
         self.assertEqual(expected_result, actual_result)
 
@@ -63,7 +70,7 @@ class TestCalculatingFunctions(unittest.TestCase):
         expected_result = [16, 16, 64, 64, 64, 64, 96, 96, 96]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_administrative_case(el, 29), 2)
+            el_res = round(calculating_state_duty_for_administrative_case(el, 29, base_value), 2)
             actual_result.append(el_res)
         self.assertEqual(expected_result, actual_result)
 
@@ -71,16 +78,16 @@ class TestCalculatingFunctions(unittest.TestCase):
         input_data_ve = [-0.00001, -1, -10000]
         input_data_te = ['', 'abc', '.', '100', '0', [], (), {}]
         for el in input_data_ve:
-            self.assertRaises(ValueError, calculating_state_duty_for_administrative_case, el, 32)
+            self.assertRaises(ValueError, calculating_state_duty_for_administrative_case, el, 32, base_value)
         for el in input_data_te:
-            self.assertRaises(TypeError, calculating_state_duty_for_administrative_case, el, 32)
+            self.assertRaises(TypeError, calculating_state_duty_for_administrative_case, el, 32, base_value)
 
     def test_calculating_state_duty_for_get_documents(self):
         input_data = [0, 1, 10, 20, 21, 99, 100, 1111, 888888]
         expected_result = [6.4, 7.36, 16, 25.6, 26.56, 101.44, 102.4, 1072.96, 853338.88]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_get_documents(el), 2)
+            el_res = round(calculating_state_duty_for_get_documents(el, base_value), 2)
             actual_result.append(el_res)
         self.assertEqual(expected_result, actual_result)
 
@@ -88,7 +95,7 @@ class TestCalculatingFunctions(unittest.TestCase):
         input_data_ve = [-0.00001, -1, -10000, 0.5, 1.5, 99.99, 0.00001, 4444444.4444444,
                          '', 'abc', '.', '100', '0', [], (), {}]
         for el in input_data_ve:
-            self.assertRaises(ValueError, calculating_state_duty_for_get_documents, el)
+            self.assertRaises(ValueError, calculating_state_duty_for_get_documents, el, base_value)
 
 
 class TestConvertingFunctions(unittest.TestCase):
@@ -106,7 +113,7 @@ class TestConvertingFunctions(unittest.TestCase):
     def test_converting_user_amount_raise_error(self):
         input_data_ve = ['12.3.4', '12,3,4', '12.3,4', '12a3', '12.a3', '1a.3', 'abc', '12-34', '1.', '.1', '']
         for el in input_data_ve:
-            self.assertRaises(ValueError, calculating_state_duty_for_get_documents, el)
+            self.assertRaises(ValueError, calculating_state_duty_for_get_documents, el, base_value)
 
     def test_converting_user_fine(self):
         input_data = ['123=56', '123.25=37', '123=10,22', '1,2=3.4', '1234', '1=2=3', '1=', '=1',
@@ -131,4 +138,4 @@ class TestConvertingFunctions(unittest.TestCase):
     def test_converting_user_pages_raise_error(self):
         input_data_ve = ['-2', '-12', '1.', '.1', '12.34', '12,34', '1a', 'b2', 'abc', '34=56', '']
         for el in input_data_ve:
-            self.assertRaises(ValueError, calculating_state_duty_for_get_documents, el)
+            self.assertRaises(ValueError, converting_user_pages, el)

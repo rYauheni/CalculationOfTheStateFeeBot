@@ -1,5 +1,5 @@
 dict_type_court = {
     'economic_court': 'Суд, рассматривающий экономические дела',
-    'common_court': '',
+    'ordinary_court': 'Суд общей юрисдикции',
     'intellectual_property_court': ''
 }

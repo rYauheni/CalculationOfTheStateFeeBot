@@ -4,7 +4,9 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler, ConversationHandler)
 
-from EconomicCourt_config import choose_instance
+from EconomicCourt_config import choose_instance_ec
+
+from OrdinaryCourt_config import choose_instance_oc
 
 from status_log_db.bot_status_log_db import (
     create_table,
@@ -13,6 +15,8 @@ from status_log_db.bot_status_log_db import (
 )
 
 from EconomicCourt_handler import ec_conv_handler_dict
+
+from OrdinaryCourt_handler import oc_conv_handler_dict
 
 from CSDB_index import TYPE_COURT
 
@@ -26,7 +30,7 @@ def start(update, _):
     create_table()
     keyboard = [
         [InlineKeyboardButton('Экономический суд', callback_data='economic_court')],
-        [InlineKeyboardButton('Общий суд', callback_data='common_court')],
+        [InlineKeyboardButton('Суд общей юрисдикции', callback_data='ordinary_court')],
         [InlineKeyboardButton('Интеллектуалка', callback_data='intellectual_property_court')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -55,11 +59,11 @@ def cancel(update, _):
 
 def select_actions_dict():
     base_dict = {TYPE_COURT: [
-        CallbackQueryHandler(choose_instance, pattern="^" + 'economic_court' + "$"),
-        CallbackQueryHandler(choose_instance, pattern="^" + 'common_court' + "$"),
-        CallbackQueryHandler(choose_instance,
+        CallbackQueryHandler(choose_instance_ec, pattern="^" + 'economic_court' + "$"),
+        CallbackQueryHandler(choose_instance_oc, pattern="^" + 'ordinary_court' + "$"),
+        CallbackQueryHandler(choose_instance_ec,
                              pattern="^" + 'intellectual_property_court' + "$")]}
-    conv_handler_dict = base_dict | ec_conv_handler_dict
+    conv_handler_dict = base_dict | ec_conv_handler_dict | oc_conv_handler_dict
     return conv_handler_dict
 
 

@@ -1,6 +1,6 @@
 import logging
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ConversationHandler
 
 from selection_dictionaries.EconomicCourt_dictionary import (
@@ -26,7 +26,8 @@ from EconomicCourt_calculating_func import (
 from Court_converting_func import (
     converting_user_amount,
     converting_user_fine,
-    converting_user_pages
+    converting_user_pages,
+    raise_incorrect_value
 )
 
 from status_log_db.bot_status_log_db import (
@@ -46,27 +47,29 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def choose_instance(update, _):
+def choose_instance_ec(update, _):
     keyboard = [
-        [InlineKeyboardButton('Первая инстанция', callback_data='first_instance')],
-        [InlineKeyboardButton('Апелляционная инстанция', callback_data='appeal')],
-        [InlineKeyboardButton('Кассационная инстанция', callback_data='cassation')],
-        [InlineKeyboardButton('Производство в порядке надзора',
+        [InlineKeyboardButton('Первая инстанция (ХП)', callback_data='first_instance')],
+        [InlineKeyboardButton('Апелляционная инстанция (ХП)', callback_data='appeal')],
+        [InlineKeyboardButton('Кассационная инстанция (ХП)', callback_data='cassation')],
+        [InlineKeyboardButton('Производство в порядке надзора (ХП)',
                               callback_data='supervisory')],
-        [InlineKeyboardButton('Производство по вновь открывшимся обстоятельствам', callback_data='newly_facts')],
+        [InlineKeyboardButton('Производство по вновь открывшимся обстоятельствам (ХП)', callback_data='newly_facts')],
         [InlineKeyboardButton('Обжалование постановления по делу об административном правонарушении',
                               callback_data='administrative_appeal')],
         [InlineKeyboardButton('Иные процессуальные действия', callback_data='other')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text('Выберите судебную инстанцию или иное производство (действие):',
+    update.callback_query.message.reply_text('Выберите судебную инстанцию для хозяйственного процесса (ХП) или '
+                                             'иной вид процесса (процессуальное действие):',
                                              reply_markup=reply_markup)
     user_id = update.callback_query.from_user.id
     type_court = update.callback_query.data
     counter = get_new_counter_value(user_id)
     add_column_value(user_id, 'type_court', type_court)
     logger.info(f"User {user_id} has chosen the type of the court "
+                f"{dict_type_court[get_column_value(user_id, 'type_court')]}"
                 f"- {dict_type_court[get_column_value(user_id, 'type_court')]}")
     update.callback_query.edit_message_text(text=f"Вы выбрали:\n{counter}. "
                                                  f"{dict_type_court[get_column_value(user_id, 'type_court')]}")
@@ -77,26 +80,26 @@ def choose_type_of_legal_proceeding_1in(update, _):
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         [InlineKeyboardButton('Приказное производство', callback_data='order_proceeding')],
-        [InlineKeyboardButton('Производство по проверке законности ННПА, действий (бездействия) '
+        [InlineKeyboardButton('По проверке законности ННПА, действий (бездействия) '
                               'государственных органов', callback_data='appeal_NNLA_proceeding')],
-        [InlineKeyboardButton('Производство об установлении юридических фактов', callback_data='special_proceeding')],
-        [InlineKeyboardButton('Производство об экономической несостоятельности (банкротстве)',
+        [InlineKeyboardButton('Об установлении юридических фактов', callback_data='special_proceeding')],
+        [InlineKeyboardButton('Об экономической несостоятельности (банкротстве)',
                               callback_data='bankrupt_proceeding')],
-        [InlineKeyboardButton('Производство по жалобам на нотариальные действия',
+        [InlineKeyboardButton('По жалобам на нотариальные действия',
                               callback_data='appeal_notarial_proceeding')],
-        [InlineKeyboardButton('Производство по делам из административных и иных публичных правоотношений',
+        [InlineKeyboardButton('По делам из административных и иных публичных правоотношений',
                               callback_data='administrative_proceeding')],
-        [InlineKeyboardButton('Производство по жалобам на ответы на обращения юридических лиц (ИП, граждан)',
+        [InlineKeyboardButton('По жалобам на ответы на обращения юридических лиц (ИП, граждан)',
                               callback_data='appeal_claim_proceeding')],
-        [InlineKeyboardButton('Производство по обжалованию действий (бездействия) судебного исполнителя',
+        [InlineKeyboardButton('По обжалованию действий (бездействия) судебного исполнителя',
                               callback_data='appeal_bailiff_proceeding')],
-        [InlineKeyboardButton('Производство по признанию и исполнению решений инсторанных содов',
+        [InlineKeyboardButton('По признанию и исполнению решений инсторанных содов',
                               callback_data='acknowledge_proceeding')],
-        [InlineKeyboardButton('Производство по выдаче исполнительного документа на исполнение решения третейского суда,'
+        [InlineKeyboardButton('По выдаче исполнительного документа на исполнение решения третейского суда,'
                               ' медиативного соглашения', callback_data='executive_doc_proceeding')],
-        [InlineKeyboardButton('Производство по обеспечению иска, рассматриваемого третейским судом, '
+        [InlineKeyboardButton('По обеспечению иска, рассматриваемого третейским судом, '
                               'медиавтивного соглашения', callback_data='securing_proceeding')],
-        [InlineKeyboardButton('Производство по отмене решений третейских, арбитражных судов',
+        [InlineKeyboardButton('По отмене решений третейских, арбитражных судов',
                               callback_data='appeal_arbitration_proceeding')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -116,24 +119,24 @@ def choose_type_of_legal_proceeding_app(update, _):
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         # del order
-        [InlineKeyboardButton('Производство по проверке законности ННПА, действий (бездействия) '
+        [InlineKeyboardButton('По проверке законности ННПА, действий (бездействия) '
                               'государственных органов', callback_data='appeal_NNLA_proceeding')],
-        [InlineKeyboardButton('Производство об установлении юридических фактов', callback_data='special_proceeding')],
+        [InlineKeyboardButton('Об установлении юридических фактов', callback_data='special_proceeding')],
         # del bankrupt
-        [InlineKeyboardButton('Производство по жалобам на нотариальные действия',
+        [InlineKeyboardButton('По жалобам на нотариальные действия',
                               callback_data='appeal_notarial_proceeding')],
-        [InlineKeyboardButton('Производство по делам из административных и иных публичных правоотношений',
+        [InlineKeyboardButton('По делам из административных и иных публичных правоотношений',
                               callback_data='administrative_proceeding')],
-        [InlineKeyboardButton('Производство по жалобам на ответы на обращения юридических лиц (ИП, граждан)',
+        [InlineKeyboardButton('По жалобам на ответы на обращения юридических лиц (ИП, граждан)',
                               callback_data='appeal_claim_proceeding')],
-        [InlineKeyboardButton('Производство по обжалованию действий (бездействия) судебного исполнителя',
+        [InlineKeyboardButton('По обжалованию действий (бездействия) судебного исполнителя',
                               callback_data='appeal_bailiff_proceeding')],
         # del acknowledge
-        [InlineKeyboardButton('Производство по выдаче исполнительного документа на исполнение решения третейского суда,'
+        [InlineKeyboardButton('По выдаче исполнительного документа на исполнение решения третейского суда,'
                               ' медиативного соглашения', callback_data='executive_doc_proceeding')],
-        [InlineKeyboardButton('Производство по обеспечению иска, рассматриваемого третейским судом, '
+        [InlineKeyboardButton('По обеспечению иска, рассматриваемого третейским судом, '
                               'медиавтивного соглашения', callback_data='securing_proceeding')],
-        [InlineKeyboardButton('Производство по отмене решений третейских, арбитражных судов',
+        [InlineKeyboardButton('По отмене решений третейских, арбитражных судов',
                               callback_data='appeal_arbitration_proceeding')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -153,25 +156,25 @@ def choose_type_of_legal_proceeding_cas_sup(update, _):
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         # del order
-        [InlineKeyboardButton('Производство по проверке законности ННПА, действий (бездействия) '
+        [InlineKeyboardButton('По проверке законности ННПА, действий (бездействия) '
                               'государственных органов', callback_data='appeal_NNLA_proceeding')],
-        [InlineKeyboardButton('Производство об установлении юридических фактов', callback_data='special_proceeding')],
+        [InlineKeyboardButton('Об установлении юридических фактов', callback_data='special_proceeding')],
         # del bankrupt
-        [InlineKeyboardButton('Производство по жалобам на нотариальные действия',
+        [InlineKeyboardButton('По жалобам на нотариальные действия',
                               callback_data='appeal_notarial_proceeding')],
-        [InlineKeyboardButton('Производство по делам из административных и иных публичных правоотношений',
+        [InlineKeyboardButton('По делам из административных и иных публичных правоотношений',
                               callback_data='administrative_proceeding')],
-        [InlineKeyboardButton('Производство по жалобам на ответы на обращения юридических лиц (ИП, граждан)',
+        [InlineKeyboardButton('По жалобам на ответы на обращения юридических лиц (ИП, граждан)',
                               callback_data='appeal_claim_proceeding')],
-        [InlineKeyboardButton('Производство по обжалованию действий (бездействия) судебного исполнителя',
+        [InlineKeyboardButton('По обжалованию действий (бездействия) судебного исполнителя',
                               callback_data='appeal_bailiff_proceeding')],
-        [InlineKeyboardButton('Производство по признанию и исполнению решений инсторанных содов',
+        [InlineKeyboardButton('По признанию и исполнению решений инсторанных содов',
                               callback_data='acknowledge_proceeding')],
-        [InlineKeyboardButton('Производство по выдаче исполнительного документа на исполнение решения третейского суда,'
+        [InlineKeyboardButton('По выдаче исполнительного документа на исполнение решения третейского суда,'
                               ' медиативного соглашения', callback_data='executive_doc_proceeding')],
-        [InlineKeyboardButton('Производство по обеспечению иска, рассматриваемого третейским судом, '
+        [InlineKeyboardButton('По обеспечению иска, рассматриваемого третейским судом, '
                               'медиавтивного соглашения', callback_data='securing_proceeding')],
-        [InlineKeyboardButton('Производство по отмене решений третейских, арбитражных судов',
+        [InlineKeyboardButton('По отмене решений третейских, арбитражных судов',
                               callback_data='appeal_arbitration_proceeding')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -191,7 +194,7 @@ def choose_type_of_ruling_on_administrative_case(update, _):
     keyboard = [
         [InlineKeyboardButton('О наложение штрафа', callback_data='fine')],
         [InlineKeyboardButton('О наложении иного административного взыскания', callback_data='other_penalty')],
-        [InlineKeyboardButton('Не связанное с наложением административного взыскания (в т.ч. о прекращении)',
+        [InlineKeyboardButton('Не связанное с наложением административного взыскания (в т.ч. о прекращении ДобАП)',
                               callback_data='non_penalty')],
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -228,7 +231,7 @@ def choose_type_of_another_procedural_action(update, _):
 
 def choose_type_of_nature_of_claim(update, _):
     keyboard = [
-        [InlineKeyboardButton('Требование имущественного характера', callback_data='property_claim')],  # +
+        [InlineKeyboardButton('Требование имущественного характера', callback_data='property_claim')],
         [InlineKeyboardButton('Требование о привлечении к субсидиарной ответственности по долгам юридического лица',
                               callback_data='subsidiary_liability_claim')],
         [InlineKeyboardButton('Требование по спору о качестве поставленного товара',
@@ -340,8 +343,7 @@ def define_price_of_claim(update, _):
     logger.info(f"User {user_id} has chosen nature of claim - "
                 f"{dict_claim[get_column_value(user_id, 'claim')]}")
 
-    coefficient = calculate_coefficient(
-        user_id)  # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ОН ЖЕ ЕСТЬ В ФОРМУЛЕ НАФИГА ОН ЕЩЁ И ЗДЕСЬ??????
+    coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     update.callback_query.message.reply_text('Укажите цену иска (оспариваемую сумму):')
     return EC_DUTY_PROPERTY
@@ -495,7 +497,7 @@ def determine_size_of_state_duty_x1(update, _):
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
     logger.info(f"User {user_id} has chosen type of a ruling on an administrative case"
-                f" - {dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}"),
+                f" - {dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{base_value * 1}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
@@ -632,11 +634,3 @@ def determine_size_of_state_duty_for_newly_facts(update, _):
                                              ' дела по вновь открывшимся обстоятельствам\n'
                                              '(пп. 1.8.4 ст. 285 Налогового кодекса Республики Беларусь)')
     return ConversationHandler.END
-
-
-def raise_incorrect_value():
-    return (
-        'Значение указано некорректно.\nФормат ввода значения:\n'
-        '1111 (для целочисленных значений)\nили\n1111.11 (для вещественных значений)',
-        'Повторно введите значение:'
-    )

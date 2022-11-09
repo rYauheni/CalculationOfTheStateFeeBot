@@ -21,3 +21,11 @@ def converting_user_pages(number: str) -> int:
         return int(number)
     else:
         raise ValueError('Number (value) must be a string that can be converted to a non-negative integer.')
+
+
+def raise_incorrect_value():
+    return (
+        'Значение указано некорректно.\nФормат ввода значения:\n'
+        '1111 (для целочисленных значений)\nили\n1111.11 (для вещественных значений)',
+        '\nПовторно введите значение:'
+    )

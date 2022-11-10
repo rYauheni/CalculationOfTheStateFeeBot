@@ -8,15 +8,19 @@ from EconomicCourt_config import choose_instance_ec
 
 from OrdinaryCourt_config import choose_instance_oc
 
+from IntellectualPropertyCourt_config import choose_instance_ipc
+
 from status_log_db.bot_status_log_db import (
     create_table,
     add_new_raw,
     add_column_value
 )
 
-from EconomicCourt_handler import ec_conv_handler_dict
+from handlers.EconomicCourt_handler import ec_conv_handler_dict
 
-from OrdinaryCourt_handler import oc_conv_handler_dict
+from handlers.OrdinaryCourt_handler import oc_conv_handler_dict
+
+from handlers.IntellectualPropertyCourt_handler import ipc_conv_handler_dict
 
 from CSDB_index import TYPE_COURT
 
@@ -29,9 +33,9 @@ logger = logging.getLogger(__name__)
 def start(update, _):
     create_table()
     keyboard = [
-        [InlineKeyboardButton('Экономический суд', callback_data='economic_court')],
         [InlineKeyboardButton('Суд общей юрисдикции', callback_data='ordinary_court')],
-        [InlineKeyboardButton('Интеллектуалка', callback_data='intellectual_property_court')]
+        [InlineKeyboardButton('Суд по делам интеллектуальной собственности', callback_data='intellectual_property_court')],
+        [InlineKeyboardButton('Экономический суд', callback_data='economic_court')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -61,9 +65,9 @@ def select_actions_dict():
     base_dict = {TYPE_COURT: [
         CallbackQueryHandler(choose_instance_ec, pattern="^" + 'economic_court' + "$"),
         CallbackQueryHandler(choose_instance_oc, pattern="^" + 'ordinary_court' + "$"),
-        CallbackQueryHandler(choose_instance_ec,
+        CallbackQueryHandler(choose_instance_ipc,
                              pattern="^" + 'intellectual_property_court' + "$")]}
-    conv_handler_dict = base_dict | ec_conv_handler_dict | oc_conv_handler_dict
+    conv_handler_dict = base_dict | ec_conv_handler_dict | oc_conv_handler_dict | ipc_conv_handler_dict
     return conv_handler_dict
 
 

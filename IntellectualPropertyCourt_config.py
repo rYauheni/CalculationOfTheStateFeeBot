@@ -63,7 +63,12 @@ def choose_instance_ipc(update: Update, _) -> int:
     logger.info(f"User {user_id} has chosen the type of the court "
                 f"- {dict_type_court[get_column_value(user_id, 'type_court')]}")
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
-                                                 f"{dict_type_court[get_column_value(user_id, 'type_court')]}")
+                                                 f"{dict_type_court[get_column_value(user_id, 'type_court')]} *\n\n"
+                                                 f"<i>* При обращении <b>нерезидентов</b> в судебную коллегию по делам"
+                                                 f"интеллектуальной собственности Верховного Суда Республики Беларусь"
+                                                 f" государственная пошлина уплачивается в иностранной валюте \n"
+                                                 f"(статья 289 Налогового кодекса Республики Беларусь)</i>",
+                                            parse_mode='HTML')
     return IPC_INSTANCE
 
 

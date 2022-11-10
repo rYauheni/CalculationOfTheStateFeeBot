@@ -2,7 +2,7 @@ import unittest
 
 from decimal import Decimal, ROUND_HALF_UP
 
-from OrdinaryCourt_calculating_func import (
+from calc_n_convert_func.OrdinaryCourt_calculating_func import (
     calculating_state_duty_for_property_and_order,
     calculating_state_duty_for_administrative_case,
     calculating_state_duty_for_get_copy_of_court_order,

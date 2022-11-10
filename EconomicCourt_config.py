@@ -1,6 +1,6 @@
 import logging
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ConversationHandler
 
 from decimal import Decimal, ROUND_HALF_UP
@@ -17,7 +17,7 @@ from selection_dictionaries.EconomicCourt_dictionary import (
 
 from selection_dictionaries.Court_dictionary import dict_type_court
 
-from EconomicCourt_calculating_func import (
+from calc_n_convert_func.EconomicCourt_calculating_func import (
     calculate_coefficient,
     calculating_state_duty_for_property,
     calculating_state_duty_for_order,
@@ -25,7 +25,7 @@ from EconomicCourt_calculating_func import (
     calculating_state_duty_for_get_documents
 )
 
-from Court_converting_func import (
+from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     converting_user_fine,
     converting_user_pages,

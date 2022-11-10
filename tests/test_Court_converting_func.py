@@ -1,6 +1,6 @@
 import unittest
 
-from Court_converting_func import (
+from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     converting_user_fine,
     converting_user_pages

@@ -73,7 +73,7 @@ def choose_instance_ec(update, _):
     logger.info(f"User {user_id} has chosen the type of the court "
                 f"{dict_type_court[get_column_value(user_id, 'type_court')]}"
                 f"- {dict_type_court[get_column_value(user_id, 'type_court')]}")
-    update.callback_query.edit_message_text(text=f"Вы выбрали:\n{counter}. "
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_type_court[get_column_value(user_id, 'type_court')]}")
     return EC_INSTANCE
 

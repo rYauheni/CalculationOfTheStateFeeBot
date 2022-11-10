@@ -17,7 +17,7 @@ from selection_dictionaries.OrdinaryCourt_dictionary import (
 
 from selection_dictionaries.Court_dictionary import dict_type_court
 
-from OrdinaryCourt_calculating_func import (
+from calc_n_convert_func.OrdinaryCourt_calculating_func import (
     calculate_coefficient,
     calculating_state_duty_for_property_and_order,
     calculating_state_duty_for_administrative_case,
@@ -25,7 +25,7 @@ from OrdinaryCourt_calculating_func import (
     calculating_state_duty_for_get_documents
 )
 
-from Court_converting_func import (
+from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     converting_user_fine,
     converting_user_pages,
@@ -71,9 +71,8 @@ def choose_instance_oc(update: Update, _) -> int:
     counter = get_new_counter_value(user_id)
     add_column_value(user_id, 'type_court', type_court)
     logger.info(f"User {user_id} has chosen the type of the court "
-                f"{dict_type_court[get_column_value(user_id, 'type_court')]}"
                 f"- {dict_type_court[get_column_value(user_id, 'type_court')]}")
-    update.callback_query.edit_message_text(text=f"Вы выбрали:\n{counter}. "
+    update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_type_court[get_column_value(user_id, 'type_court')]}")
     return OC_INSTANCE
 

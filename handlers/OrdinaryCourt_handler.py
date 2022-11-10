@@ -36,7 +36,7 @@ oc_conv_handler_dict = {
         CallbackQueryHandler(determine_size_of_state_duty_x1, pattern="^" + 'appeal_non_court_order' + "$"),
         CallbackQueryHandler(choose_type_of_appeal_court_criminal_order, pattern="^" + 'appeal_court_order' + "$"),
         CallbackQueryHandler(choose_type_of_nature_of_claim_for_civil_in_criminal,
-                             pattern="^" + 'in_part_of_civil_lawsuit' + "$")  # ???????????????????????????????????? PEREDELAT'
+                             pattern="^" + 'in_part_of_civil_lawsuit' + "$")
     ],
     OC_OTHER: [
         CallbackQueryHandler(determine_size_of_state_duty_x01, pattern="^" + 'another_complaint' + "$"),

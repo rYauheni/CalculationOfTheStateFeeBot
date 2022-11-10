@@ -1,5 +1,7 @@
 import re
 
+from decimal import Decimal, ROUND_HALF_UP
+
 
 def converting_user_amount(amount: str) -> float:
     amount = re.sub(',', '.', amount)
@@ -7,7 +9,7 @@ def converting_user_amount(amount: str) -> float:
     data_type_check = re.search(r'^\d+\.*\d*$', amount)
     if data_type_check:
         if float(amount) >= 0:
-            return round(float(amount), 2)
+            return float(float(Decimal(str(amount)).quantize(Decimal('1.00'), ROUND_HALF_UP)))
         raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
     raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
 

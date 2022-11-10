@@ -1,16 +1,12 @@
 import unittest
 
+from decimal import Decimal, ROUND_HALF_UP
+
 from EconomicCourt_calculating_func import (
     calculating_state_duty_for_property,
     calculating_state_duty_for_order,
     calculating_state_duty_for_administrative_case,
     calculating_state_duty_for_get_documents
-)
-
-from Court_converting_func import (
-    converting_user_amount,
-    converting_user_fine,
-    converting_user_pages
 )
 
 from user_id_for_test import user_id
@@ -27,8 +23,9 @@ class TestCalculatingFunctions(unittest.TestCase):
                            10240, 10240, 10240, 10240, 10240, 10240, 10240.01, 55555.56]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_property(el, base_value, user_id), 2)
-            actual_result.append(el_res)
+            el_res = calculating_state_duty_for_property(el, base_value, user_id)
+            el_dec = float(Decimal(str(el_res)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+            actual_result.append(el_dec)
         self.assertEqual(expected_result, actual_result)
 
     def test_calculating_state_duty_for_property_raise_error(self):
@@ -44,8 +41,9 @@ class TestCalculatingFunctions(unittest.TestCase):
         expected_result = [64, 64, 160, 160, 160, 160, 224, 224, 224]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_order(el, base_value), 2)
-            actual_result.append(el_res)
+            el_res = calculating_state_duty_for_order(el, base_value)
+            el_dec = float(Decimal(str(el_res)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+            actual_result.append(el_dec)
         self.assertEqual(expected_result, actual_result)
 
     def test_calculating_state_duty_for_order_raise_error(self):
@@ -61,8 +59,9 @@ class TestCalculatingFunctions(unittest.TestCase):
         expected_result = [16, 16, 64, 64, 64, 64, 96, 96, 96]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_administrative_case(el, 32, base_value), 2)
-            actual_result.append(el_res)
+            el_res = calculating_state_duty_for_administrative_case(el, 32, base_value)
+            el_dec = float(Decimal(str(el_res)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+            actual_result.append(el_dec)
         self.assertEqual(expected_result, actual_result)
 
     def test_calculating_state_duty_for_administrative_case_29(self):
@@ -70,8 +69,9 @@ class TestCalculatingFunctions(unittest.TestCase):
         expected_result = [16, 16, 64, 64, 64, 64, 96, 96, 96]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_administrative_case(el, 29, base_value), 2)
-            actual_result.append(el_res)
+            el_res = calculating_state_duty_for_administrative_case(el, 29, base_value)
+            el_dec = float(Decimal(str(el_res)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+            actual_result.append(el_dec)
         self.assertEqual(expected_result, actual_result)
 
     def test_calculating_state_duty_for_administrative_case_raise_error(self):
@@ -87,8 +87,9 @@ class TestCalculatingFunctions(unittest.TestCase):
         expected_result = [6.4, 7.36, 16, 25.6, 26.56, 101.44, 102.4, 1072.96, 853338.88]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_get_documents(el, base_value), 2)
-            actual_result.append(el_res)
+            el_res = calculating_state_duty_for_get_documents(el, base_value)
+            el_dec = float(Decimal(str(el_res)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+            actual_result.append(el_dec)
         self.assertEqual(expected_result, actual_result)
 
     def test_calculating_state_duty_for_get_documents_raise_error(self):
@@ -96,6 +97,3 @@ class TestCalculatingFunctions(unittest.TestCase):
                          '', 'abc', '.', '100', '0', [], (), {}]
         for el in input_data_ve:
             self.assertRaises(ValueError, calculating_state_duty_for_get_documents, el, base_value)
-
-
-

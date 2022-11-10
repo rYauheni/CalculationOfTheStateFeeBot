@@ -39,8 +39,9 @@ class TestCalculatingFunctions(unittest.TestCase):
         expected_result = [16, 16, 64, 64, 64, 64, 96, 96, 96]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_administrative_case(el, 32, base_value), 2)
-            actual_result.append(el_res)
+            el_res = calculating_state_duty_for_administrative_case(el, 32, base_value)
+            el_dec = float(Decimal(str(el_res)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+            actual_result.append(el_dec)
         self.assertEqual(expected_result, actual_result)
 
     def test_calculating_state_duty_for_administrative_case_29(self):
@@ -48,8 +49,9 @@ class TestCalculatingFunctions(unittest.TestCase):
         expected_result = [16, 16, 64, 64, 64, 64, 96, 96, 96]
         actual_result = list()
         for el in input_data:
-            el_res = round(calculating_state_duty_for_administrative_case(el, 29, base_value), 2)
-            actual_result.append(el_res)
+            el_res = calculating_state_duty_for_administrative_case(el, 29, base_value)
+            el_dec = float(Decimal(str(el_res)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+            actual_result.append(el_dec)
         self.assertEqual(expected_result, actual_result)
 
     def test_calculating_state_duty_for_administrative_case_raise_error(self):

@@ -59,7 +59,8 @@ oc_conv_handler_dict = {
         CallbackQueryHandler(determine_size_of_state_duty_x1, pattern="^" + 'other_sup_criminal' + "$")
     ],
     OC_DUTY_PROPERTY_ORDER: [
-        MessageHandler(Filters.text & ~Filters.command, determine_size_of_state_duty_for_property_and_order_claim)],
+        MessageHandler(Filters.text & ~Filters.command, determine_size_of_state_duty_for_property_and_order_claim)
+    ],
     OC_DUTY_ADM_CASE: [
         MessageHandler(Filters.text & ~Filters.command, determine_size_of_state_duty_for_administrative_case)
     ],

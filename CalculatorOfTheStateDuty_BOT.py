@@ -4,11 +4,11 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler, ConversationHandler)
 
-from EconomicCourt_config import choose_instance_ec
+from configs.EconomicCourt_config import choose_instance_ec
 
-from OrdinaryCourt_config import choose_instance_oc
+from configs.OrdinaryCourt_config import choose_instance_oc
 
-from IntellectualPropertyCourt_config import choose_instance_ipc
+from configs.IntellectualPropertyCourt_config import choose_instance_ipc
 
 from status_log_db.bot_status_log_db import (
     create_table,

@@ -1,6 +1,6 @@
 from telegram.ext import (MessageHandler, CallbackQueryHandler, Filters)
 
-from OrdinaryCourt_config import *
+from configs.OrdinaryCourt_config import *
 
 from CSDB_index import (OC_INSTANCE, OC_PROCEEDING, OC_ADM_CASE, OC_CRIMINAL, OC_OTHER, OC_CLAIM, OC_TYPE_CRIMINAL_SUP,
                         OC_DUTY_PROPERTY_ORDER, OC_DUTY_ADM_CASE, OC_DUTY_COURT_ORDER, OC_DUTY_O_DOCUMENTS)

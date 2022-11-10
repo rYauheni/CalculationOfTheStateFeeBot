@@ -1,6 +1,6 @@
 from telegram.ext import (MessageHandler, CallbackQueryHandler, Filters)
 
-from IntellectualPropertyCourt_config import *
+from configs.IntellectualPropertyCourt_config import *
 
 from CSDB_index import (IPC_INSTANCE, IPC_PROCEEDING, IPC_OTHER, IPC_CLAIM, IPC_SUBJECT_1, IPC_SUBJECT_2,
                         IPC_DUTY_PROPERTY, IPC_DUTY_COURT_ORDER)

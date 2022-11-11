@@ -4,23 +4,27 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
 
 from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler, ConversationHandler)
 
-from configs.EconomicCourt_config import choose_instance_ec
-
-from configs.OrdinaryCourt_config import choose_instance_oc
-
-from configs.IntellectualPropertyCourt_config import choose_instance_ipc
-
 from status_log_db.bot_status_log_db import (
     create_table,
     add_new_raw,
     add_column_value
 )
 
+from configs.EconomicCourt_config import choose_instance_ec
+
+from configs.OrdinaryCourt_config import choose_instance_oc
+
+from configs.IntellectualPropertyCourt_config import choose_instance_ipc
+
+from configs.InternationalArbitrationCourt_config import choose_subject_iac
+
 from handlers.EconomicCourt_handler import ec_conv_handler_dict
 
 from handlers.OrdinaryCourt_handler import oc_conv_handler_dict
 
 from handlers.IntellectualPropertyCourt_handler import ipc_conv_handler_dict
+
+from handlers.InternationalArbitrationCourt_handler import iac_conv_handler_dict
 
 from CSDB_index import TYPE_COURT
 
@@ -34,8 +38,11 @@ def start(update, _):
     create_table()
     keyboard = [
         [InlineKeyboardButton('Суд общей юрисдикции', callback_data='ordinary_court')],
-        [InlineKeyboardButton('Суд по делам интеллектуальной собственности', callback_data='intellectual_property_court')],
-        [InlineKeyboardButton('Экономический суд', callback_data='economic_court')]
+        [InlineKeyboardButton('Суд по делам интеллектуальной собственности',
+                              callback_data='intellectual_property_court')],
+        [InlineKeyboardButton('Экономический суд', callback_data='economic_court')],
+        [InlineKeyboardButton('Международный арбитражный суд при БелТПП',
+                              callback_data='international_arbitration_court')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -63,11 +70,14 @@ def cancel(update, _):
 
 def select_actions_dict():
     base_dict = {TYPE_COURT: [
-        CallbackQueryHandler(choose_instance_ec, pattern="^" + 'economic_court' + "$"),
         CallbackQueryHandler(choose_instance_oc, pattern="^" + 'ordinary_court' + "$"),
         CallbackQueryHandler(choose_instance_ipc,
-                             pattern="^" + 'intellectual_property_court' + "$")]}
-    conv_handler_dict = base_dict | ec_conv_handler_dict | oc_conv_handler_dict | ipc_conv_handler_dict
+                             pattern="^" + 'intellectual_property_court' + "$"),
+        CallbackQueryHandler(choose_instance_ec, pattern="^" + 'economic_court' + "$"),
+        CallbackQueryHandler(choose_subject_iac,
+                             pattern="^" + 'international_arbitration_court' + "$")
+    ]}
+    conv_handler_dict = base_dict | ec_conv_handler_dict | oc_conv_handler_dict | ipc_conv_handler_dict | iac_conv_handler_dict
     return conv_handler_dict
 
 

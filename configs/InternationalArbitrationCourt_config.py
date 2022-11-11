@@ -35,7 +35,7 @@ from CSDB_index import (IAC_SUBJECT, IAC_PROCEEDING, IAC_INSTANCE, IAC_CLAIM, IA
 
 from BaseValue.base_value import base_value
 
-note = '\n\n<i>*Арбитражный сбор определён без учёта его увеличенния на сумму налога на добавленную стоимость.\n' \
+note = '\n\n<i>*Арбитражный сбор определён без учёта его увеличения на сумму налога на добавленную стоимость.\n' \
        'Необходимость увеличения арбитражного сбора на сумму НДС следует уточнять в МАС</i>'
 
 logging.basicConfig(
@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 def choose_subject_iac(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Резиденты Республики Беларусь (обе стороны)', callback_data='resident')],
-        [InlineKeyboardButton('Одна из сторон (или обе) - нерездент', callback_data='non-resident')]
+        [InlineKeyboardButton('Одна из сторон (или обе) - нерезидент', callback_data='non-resident')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 

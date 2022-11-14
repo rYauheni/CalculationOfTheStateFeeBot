@@ -165,7 +165,8 @@ def determine_size_of_arbitration_fee_for_property_claim(update: Update, _) -> i
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'resident':
-            arbitration_fee = calculating_arbitration_fee_for_property_for_resident(convert_claim_price, base_value, user_id)
+            arbitration_fee = calculating_arbitration_fee_for_property_for_resident(convert_claim_price,
+                                                                                    base_value, user_id)
             arbitration_fee = float(Decimal(str(arbitration_fee)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер арбитражного сбора составляет:\n\n<b>{arbitration_fee}</b> BYN*{note}',
                                       parse_mode='HTML')

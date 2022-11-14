@@ -1,8 +1,32 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# This program is dedicated to the public domain under the CC0 license.
+
+"""
+This bot allows you to calculate the state duty for the courts of the Republic of Belarus,
+as well as the arbitration fee for the International Arbitration Court at the BelCCI, taking into account the following:
+- for all courts;
+- for all types of processes;
+- for all judicial instances;
+- for all types of legal proceedings;
+- for all kinds of claims.
+
+The procedure for calculating the state duty (arbitration fee) is determined based on the
+Tax Code of the Republic of Belarus, the Civil Procedure Code of the Republic of Belarus,
+the Economic Procedure Code of the Republic of Belarus,
+the regulations of the International Arbitration Court at the BelCCI,
+the resolution of the Council of Ministers of the Republic of Belarus
+on the approval of establishing the size of the base value.
+
+The calculation of the state duty (arbitration fee) is approximate.
+The calculation made by this bot CAN NOT be used as evidence in court and DOES NOT HAVE legal force.
+"""
+
 import logging
 
-from telegram import (InlineKeyboardButton, InlineKeyboardMarkup)
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 
-from telegram.ext import (Updater, CommandHandler, CallbackQueryHandler, ConversationHandler)
+from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler
 
 from status_log_db.bot_status_log_db import (
     create_table,
@@ -34,7 +58,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(update, _):
+def start(update: Update, _) -> int:
     create_table()
     keyboard = [
         [InlineKeyboardButton('Суд общей юрисдикции', callback_data='ordinary_court')],
@@ -59,7 +83,7 @@ def start(update, _):
     return TYPE_COURT
 
 
-def cancel(update, _):
+def cancel(update: Update, _) -> int:
     user = update.message.from_user
     logger.info(f'User {user.first_name} has canceled process')
     update.message.reply_text(
@@ -68,7 +92,7 @@ def cancel(update, _):
     return ConversationHandler.END
 
 
-def select_actions_dict():
+def select_actions_dict() -> dict:
     base_dict = {TYPE_COURT: [
         CallbackQueryHandler(choose_instance_oc, pattern="^" + 'ordinary_court' + "$"),
         CallbackQueryHandler(choose_instance_ipc,
@@ -77,7 +101,8 @@ def select_actions_dict():
         CallbackQueryHandler(choose_subject_iac,
                              pattern="^" + 'international_arbitration_court' + "$")
     ]}
-    conv_handler_dict = base_dict | ec_conv_handler_dict | oc_conv_handler_dict | ipc_conv_handler_dict | iac_conv_handler_dict
+    conv_handler_dict = \
+        base_dict | ec_conv_handler_dict | oc_conv_handler_dict | ipc_conv_handler_dict | iac_conv_handler_dict
     return conv_handler_dict
 
 

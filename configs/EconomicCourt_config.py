@@ -1,6 +1,6 @@
 import logging
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ConversationHandler
 
 from decimal import Decimal, ROUND_HALF_UP
@@ -49,7 +49,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def choose_instance_ec(update, _):
+def choose_instance_ec(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Первая инстанция (ХП)', callback_data='first_instance')],
         [InlineKeyboardButton('Апелляционная инстанция (ХП)', callback_data='appeal')],
@@ -78,7 +78,7 @@ def choose_instance_ec(update, _):
     return EC_INSTANCE
 
 
-def choose_type_of_legal_proceeding_1in(update, _):
+def choose_type_of_legal_proceeding_1in(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         [InlineKeyboardButton('Приказное производство', callback_data='order_proceeding')],
@@ -117,7 +117,7 @@ def choose_type_of_legal_proceeding_1in(update, _):
     return EC_PROCEEDING
 
 
-def choose_type_of_legal_proceeding_app(update, _):
+def choose_type_of_legal_proceeding_app(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         # del order
@@ -154,7 +154,7 @@ def choose_type_of_legal_proceeding_app(update, _):
     return EC_PROCEEDING
 
 
-def choose_type_of_legal_proceeding_cas_sup(update, _):
+def choose_type_of_legal_proceeding_cas_sup(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         # del order
@@ -192,7 +192,7 @@ def choose_type_of_legal_proceeding_cas_sup(update, _):
     return EC_PROCEEDING
 
 
-def choose_type_of_ruling_on_administrative_case(update, _):
+def choose_type_of_ruling_on_administrative_case(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('О наложение штрафа', callback_data='fine')],
         [InlineKeyboardButton('О наложении иного административного взыскания', callback_data='other_penalty')],
@@ -213,7 +213,7 @@ def choose_type_of_ruling_on_administrative_case(update, _):
     return EC_ADM_CASE
 
 
-def choose_type_of_another_procedural_action(update, _):
+def choose_type_of_another_procedural_action(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Рассмотрение иной жалобы', callback_data='another_complaint')],
         [InlineKeyboardButton('Выдача судом дубликатов, копий документов', callback_data='get_documents')]
@@ -231,7 +231,7 @@ def choose_type_of_another_procedural_action(update, _):
     return EC_OTHER
 
 
-def choose_type_of_nature_of_claim(update, _):
+def choose_type_of_nature_of_claim(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Требование имущественного характера', callback_data='property_claim')],
         [InlineKeyboardButton('Требование о привлечении к субсидиарной ответственности по долгам юридического лица',
@@ -256,7 +256,7 @@ def choose_type_of_nature_of_claim(update, _):
     return EC_CLAIM
 
 
-def choose_subject(update, _):
+def choose_subject(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Юридическое лицо', callback_data='entity')],
         [InlineKeyboardButton('Индивидуальный предприниматель',
@@ -287,7 +287,7 @@ def choose_subject(update, _):
     return EC_SUBJECT
 
 
-def choose_court(update, _):
+def choose_court(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Верховный Суд Республики Беларусь', callback_data='supreme_court')],
         [InlineKeyboardButton('Экономические суды областей (города Минска)',
@@ -335,7 +335,7 @@ def choose_court(update, _):
         return EC_COURT_2
 
 
-def define_price_of_claim(update, _):
+def define_price_of_claim(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     claim = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -351,7 +351,7 @@ def define_price_of_claim(update, _):
     return EC_DUTY_PROPERTY
 
 
-def define_amount_for_order_proceeding(update, _):
+def define_amount_for_order_proceeding(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     proceeding = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -364,7 +364,7 @@ def define_amount_for_order_proceeding(update, _):
     return EC_DUTY_ORDER
 
 
-def define_fine(update, _):
+def define_fine(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     ruling_on_adm = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -386,7 +386,7 @@ def define_fine(update, _):
     return EC_DUTY_ADM_CASE
 
 
-def define_number_of_documents(update, _):
+def define_number_of_documents(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     another_action = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -399,7 +399,7 @@ def define_number_of_documents(update, _):
     return EC_DUTY_DOCUMENTS
 
 
-def determine_size_of_state_duty_for_property_claim(update, _):
+def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the price of the claim - {update.message.text}")
     try:
@@ -415,7 +415,7 @@ def determine_size_of_state_duty_for_property_claim(update, _):
         return ConversationHandler.END
 
 
-def determine_size_of_state_duty_for_order_claim(update, _):
+def determine_size_of_state_duty_for_order_claim(update: Update, _) -> int:
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified amount of recovery - {update.message.text}")
     try:
@@ -431,7 +431,7 @@ def determine_size_of_state_duty_for_order_claim(update, _):
         return ConversationHandler.END
 
 
-def determine_size_of_state_duty_for_administrative_case(update, _):
+def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> int:
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the size of fine - {update.message.text}")
     convert_b_v = base_value
@@ -466,7 +466,7 @@ def determine_size_of_state_duty_for_administrative_case(update, _):
         update.message.reply_text(raise_incorrect_value()[1])
 
 
-def determine_size_of_state_duty_for_get_documents(update, _):
+def determine_size_of_state_duty_for_get_documents(update: Update, _) -> int:
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the number of pages - {update.message.text}")
     try:
@@ -482,7 +482,7 @@ def determine_size_of_state_duty_for_get_documents(update, _):
         return ConversationHandler.END
 
 
-def determine_size_of_state_duty_x05(update, _):
+def determine_size_of_state_duty_x05(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     another_action = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -498,7 +498,7 @@ def determine_size_of_state_duty_x05(update, _):
     return ConversationHandler.END
 
 
-def determine_size_of_state_duty_x1(update, _):
+def determine_size_of_state_duty_x1(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     ruling_on_adm = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -514,7 +514,7 @@ def determine_size_of_state_duty_x1(update, _):
     return ConversationHandler.END
 
 
-def determine_size_of_state_duty_x5(update, _):
+def determine_size_of_state_duty_x5(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     subject = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -531,7 +531,7 @@ def determine_size_of_state_duty_x5(update, _):
     return ConversationHandler.END
 
 
-def determine_size_of_state_duty_x10(update, _):
+def determine_size_of_state_duty_x10(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     counter = get_new_counter_value(user_id)
     if get_column_value(user_id, 'claim'):
@@ -570,7 +570,7 @@ def determine_size_of_state_duty_x10(update, _):
     return ConversationHandler.END
 
 
-def determine_size_of_state_duty_x15(update, _):
+def determine_size_of_state_duty_x15(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     court = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -587,7 +587,7 @@ def determine_size_of_state_duty_x15(update, _):
     return ConversationHandler.END
 
 
-def determine_size_of_state_duty_x20(update, _):
+def determine_size_of_state_duty_x20(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     court = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -604,7 +604,7 @@ def determine_size_of_state_duty_x20(update, _):
     return ConversationHandler.END
 
 
-def determine_size_of_state_duty_x25(update, _):
+def determine_size_of_state_duty_x25(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     claim = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -621,7 +621,7 @@ def determine_size_of_state_duty_x25(update, _):
     return ConversationHandler.END
 
 
-def determine_size_of_state_duty_x50(update, _):
+def determine_size_of_state_duty_x50(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     court = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -638,7 +638,7 @@ def determine_size_of_state_duty_x50(update, _):
     return ConversationHandler.END
 
 
-def determine_size_of_state_duty_for_newly_facts(update, _):
+def determine_size_of_state_duty_for_newly_facts(update: Update, _) -> int:
     user_id = update.callback_query.from_user.id
     instance = update.callback_query.data
     counter = get_new_counter_value(user_id)

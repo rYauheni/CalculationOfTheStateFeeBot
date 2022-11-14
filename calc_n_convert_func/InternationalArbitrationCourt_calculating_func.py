@@ -10,7 +10,7 @@ def calculate_coefficient(user_id: int) -> float:
     return coefficient
 
 
-def calculating_state_duty_for_property_for_resident(amount: float, base_value: float, user_id: int) -> float:
+def calculating_arbitration_fee_for_property_for_resident(amount: float, base_value: float, user_id: int) -> float:
     coefficient = calculate_coefficient(user_id)
     if 0 <= amount < base_value * 1000:
         return base_value * 50
@@ -28,7 +28,7 @@ def calculating_state_duty_for_property_for_resident(amount: float, base_value: 
         raise ValueError('Amount (value) must be non-negative number.')
 
 
-def calculating_state_duty_for_property_for_non_resident(amount: float, user_id: int) -> float:
+def calculating_arbitration_fee_for_property_for_non_resident(amount: float, user_id: int) -> float:
     coefficient = calculate_coefficient(user_id)
     if 0 <= amount <= 5000:
         return 700.0

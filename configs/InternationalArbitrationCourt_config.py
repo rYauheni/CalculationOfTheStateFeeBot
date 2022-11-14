@@ -16,8 +16,8 @@ from selection_dictionaries.Court_dictionary import dict_type_court
 
 from calc_n_convert_func.InternationalArbitrationCourt_calculating_func import (
     calculate_coefficient,
-    calculating_state_duty_for_property_for_resident,
-    calculating_state_duty_for_property_for_non_resident
+    calculating_arbitration_fee_for_property_for_resident,
+    calculating_arbitration_fee_for_property_for_non_resident
 )
 
 from calc_n_convert_func.Court_converting_func import (
@@ -165,12 +165,12 @@ def determine_size_of_arbitration_fee_for_property_claim(update: Update, _) -> i
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'resident':
-            arbitration_fee = calculating_state_duty_for_property_for_resident(convert_claim_price, base_value, user_id)
+            arbitration_fee = calculating_arbitration_fee_for_property_for_resident(convert_claim_price, base_value, user_id)
             arbitration_fee = float(Decimal(str(arbitration_fee)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер арбитражного сбора составляет:\n\n<b>{arbitration_fee}</b> BYN*{note}',
                                       parse_mode='HTML')
         elif get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'non-resident':
-            arbitration_fee = calculating_state_duty_for_property_for_non_resident(convert_claim_price, user_id)
+            arbitration_fee = calculating_arbitration_fee_for_property_for_non_resident(convert_claim_price, user_id)
             arbitration_fee = float(Decimal(str(arbitration_fee)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер арбитражного сбора составляет:\n\n<b>{arbitration_fee}</b> EUR*{note}',
                                       parse_mode='HTML')

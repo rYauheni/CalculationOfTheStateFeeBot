@@ -46,6 +46,7 @@ logger = logging.getLogger(__name__)
 
 
 def choose_instance_ipc(update: Update, _) -> int:
+    """ type_court -> instance """
     keyboard = [
         [InlineKeyboardButton('Первая инстанция', callback_data='first_instance')],
         [InlineKeyboardButton('Производство в порядке надзора', callback_data='supervisory')],
@@ -73,6 +74,7 @@ def choose_instance_ipc(update: Update, _) -> int:
 
 
 def choose_type_of_legal_proceeding(update: Update, _) -> int:
+    """ type_court -> instance (first, supervisory) -> legal_proceeding """
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         [InlineKeyboardButton('Обжалование решения органа по вопросам интеллектуальной собственности',
@@ -92,6 +94,7 @@ def choose_type_of_legal_proceeding(update: Update, _) -> int:
 
 
 def choose_type_of_another_procedural_action(update: Update, _) -> int:
+    """ type_court -> instance (other) -> another_action """
     keyboard = [
         [InlineKeyboardButton('Рассмотрение иной жалобы', callback_data='another_complaint')],
         [InlineKeyboardButton('Повторная выдача копий судебных постановлений',
@@ -111,6 +114,7 @@ def choose_type_of_another_procedural_action(update: Update, _) -> int:
 
 
 def choose_type_of_nature_of_claim(update: Update, _) -> int:
+    """ type_court -> instance (first, supervisory) -> legal_proceeding (lawsuit) -> claim """
     keyboard = [
         [InlineKeyboardButton('Требование имущественного характера', callback_data='property_claim')],
         [InlineKeyboardButton('Требование неимущественного характера', callback_data='non-pecuniary_claim')]
@@ -131,6 +135,11 @@ def choose_type_of_nature_of_claim(update: Update, _) -> int:
 
 
 def choose_subject(update: Update, _) -> int:
+    """ type_court ->
+        [instance (first, supervisory) ->
+            [legal_proceeding (lawsuit) -> claim (non-pecuniary)] or [legal_proceeding (appealing_decision)]] or
+        [instance (other)] ->
+         subject """
     keyboard = [
         [InlineKeyboardButton('Юридическое лицо (организация)', callback_data='entity')],
         [InlineKeyboardButton('Физическое лицо', callback_data='individual')]
@@ -159,13 +168,6 @@ def choose_subject(update: Update, _) -> int:
                         f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
             update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                          f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
-        elif not get_column_value(user_id, 'instance'):
-            instance = update.callback_query.data
-            add_column_value(user_id, 'instance', instance)
-            logger.info(f"User {user_id} has chosen instance -"
-                        f" {dict_instance[get_column_value(user_id, 'instance')]}")
-            update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
-                                                         f"{dict_instance[get_column_value(user_id, 'instance')]}")
         return IPC_SUBJECT_1
     elif get_column_value(user_id, 'instance') and get_column_value(user_id, 'instance') == 'other':
         another_action = update.callback_query.data
@@ -178,6 +180,7 @@ def choose_subject(update: Update, _) -> int:
 
 
 def define_amount(update: Update, _) -> int:
+    """ type_court -> instance (first, supervisory) -> legal_proceeding (lawsuit) -> claim (property) -> amount """
     user_id = update.callback_query.from_user.id
     claim = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -194,6 +197,7 @@ def define_amount(update: Update, _) -> int:
 
 
 def define_number_of_pages_court_order(update: Update, _) -> int:
+    """ type_court -> instance (other) -> another_action (get_copy_of_court_order) -> define_pages """
     user_id = update.callback_query.from_user.id
     subject = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -208,6 +212,8 @@ def define_number_of_pages_court_order(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
+    """ type_court -> instance (first, supervisory) -> legal_proceeding (lawsuit) -> claim (property) -> amount ->
+    state_duty_property """
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the price of the claim - {update.message.text}")
     try:
@@ -224,6 +230,8 @@ def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_for_get_copy_of_court_order(update: Update, _) -> int:
+    """ type_court -> instance (other) -> another_action (get_copy_of_court_order) -> define_pages ->
+    state_duty_get_copy """
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the number of pages - {update.message.text}")
     try:
@@ -246,6 +254,7 @@ def determine_size_of_state_duty_for_get_copy_of_court_order(update: Update, _) 
 
 
 def determine_size_of_state_duty_x05(update: Update, _) -> int:
+    """ type_court -> instance (other) -> another_action (another_complaint) -> state_duty_x05 """
     user_id = update.callback_query.from_user.id
     another_action = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -261,6 +270,8 @@ def determine_size_of_state_duty_x05(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x20(update: Update, _) -> int:
+    """ type_court -> instance (first, supervisory) -> legal_proceeding -> [claim (non-pecuniary)] ->
+    subject (individual) - state_duty_x20 """
     user_id = update.callback_query.from_user.id
     subject = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -277,6 +288,8 @@ def determine_size_of_state_duty_x20(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x50(update: Update, _) -> int:
+    """ type_court -> instance (first, supervisory) -> legal_proceeding -> [claim (non-pecuniary)] ->
+    subject (entity) - state_duty_x50 """
     user_id = update.callback_query.from_user.id
     subject = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -293,6 +306,7 @@ def determine_size_of_state_duty_x50(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_for_newly_facts(update, _):
+    """ type_court -> instance (newly_facts) -> state_duty_newly_facts """
     user_id = update.callback_query.from_user.id
     instance = update.callback_query.data
     counter = get_new_counter_value(user_id)

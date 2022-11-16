@@ -45,6 +45,7 @@ logger = logging.getLogger(__name__)
 
 
 def choose_subject_iac(update: Update, _) -> int:
+    """ type_court -> subject """
     keyboard = [
         [InlineKeyboardButton('Резиденты Республики Беларусь (обе стороны)', callback_data='resident')],
         [InlineKeyboardButton('Одна из сторон (или обе) - нерезидент', callback_data='non-resident')]
@@ -65,6 +66,7 @@ def choose_subject_iac(update: Update, _) -> int:
 
 
 def choose_type_of_legal_proceeding(update: Update, _) -> int:
+    """ type_court -> subject (resident) -> legal_proceeding """
     keyboard = [
         [InlineKeyboardButton('Обычная процедура', callback_data='ordinary')],
         [InlineKeyboardButton('Упрощённая процедура', callback_data='simplified')]
@@ -83,6 +85,9 @@ def choose_type_of_legal_proceeding(update: Update, _) -> int:
 
 
 def choose_instance(update: Update, _) -> int:
+    """ type_court ->
+        [subject (resident) -> legal_proceeding (ordinary) {if}] or [subject(non-resident) {else}] ->
+        instance """
     keyboard = [
         [InlineKeyboardButton('Единоличное разрешение (1 арбитр)', callback_data='one')],
         [InlineKeyboardButton('Коллегиальное разрешение (3 арбитра)', callback_data='collegial')]
@@ -110,6 +115,10 @@ def choose_instance(update: Update, _) -> int:
 
 
 def choose_type_of_nature_of_claim(update: Update, _) -> int:
+    """ type_court ->
+        [subject (resident) -> [legal_proceeding (simplified)] or [legal_proceeding (ordinary) -> instance]] or
+        [subject (non-resident) -> instance] ->
+        claim """
     keyboard = [
         [InlineKeyboardButton('Требование имущественного характера', callback_data='property_claim')],
         [InlineKeyboardButton('Требование неимущественного характера', callback_data='non-pecuniary_claim')]
@@ -137,6 +146,7 @@ def choose_type_of_nature_of_claim(update: Update, _) -> int:
 
 
 def define_amount(update: Update, _) -> int:
+    """ type_court -> subject -> [legal_proceeding] -> [instance] -> claim (property) -> amount """
     user_id = update.callback_query.from_user.id
     claim = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -156,6 +166,7 @@ def define_amount(update: Update, _) -> int:
 
 
 def determine_size_of_arbitration_fee_for_property_claim(update: Update, _) -> int:
+    """ type_court -> subject -> [legal_proceeding] -> [instance] -> claim (property) -> amount -> arbitration_fee """
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the price of the claim - {update.message.text}")
     try:
@@ -179,6 +190,7 @@ def determine_size_of_arbitration_fee_for_property_claim(update: Update, _) -> i
 
 
 def determine_size_of_arbitration_fee_for_non_pecuniary_claim(update: Update, _) -> int:
+    """ type_court -> subject -> [legal_proceeding] -> [instance] -> claim (non-pecuniary) -> arbitration_fee """
     user_id = update.callback_query.from_user.id
     claim = update.callback_query.data
     counter = get_new_counter_value(user_id)

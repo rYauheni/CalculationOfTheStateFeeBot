@@ -85,11 +85,17 @@ def start(update: Update, _) -> int:
 
 def cancel(update: Update, _) -> int:
     user = update.message.from_user
-    logger.info(f'User {user.first_name} has canceled process')
+    logger.info(f'User {user.id} has canceled process')
     update.message.reply_text(
         'Действие работы бота прервано.\nДля возобновления работы введите /start'
     )
     return ConversationHandler.END
+
+
+def info(update: Update, _):
+    user = update.message.from_user
+    logger.info(f'User {user.id} has received info')
+    update.message.reply_text('info_check')
 
 
 def select_actions_dict() -> dict:
@@ -115,7 +121,8 @@ def main():
         fallbacks=[CommandHandler('cancel', cancel)]
     )
     dispatcher.add_handler(conv_handler)
-
+    info_handler = CommandHandler('info', info)
+    dispatcher.add_handler(info_handler)
     updater.start_polling()
     updater.idle()
 

@@ -50,6 +50,7 @@ logger = logging.getLogger(__name__)
 
 
 def choose_instance_ec(update: Update, _) -> int:
+    """ type_court -> instance """
     keyboard = [
         [InlineKeyboardButton('Первая инстанция (ХП)', callback_data='first_instance')],
         [InlineKeyboardButton('Апелляционная инстанция (ХП)', callback_data='appeal')],
@@ -79,6 +80,7 @@ def choose_instance_ec(update: Update, _) -> int:
 
 
 def choose_type_of_legal_proceeding_1in(update: Update, _) -> int:
+    """ type_court -> instance (first) -> legal_proceeding """
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         [InlineKeyboardButton('Приказное производство', callback_data='order_proceeding')],
@@ -95,12 +97,12 @@ def choose_type_of_legal_proceeding_1in(update: Update, _) -> int:
                               callback_data='appeal_claim_proceeding')],
         [InlineKeyboardButton('По обжалованию действий (бездействия) судебного исполнителя',
                               callback_data='appeal_bailiff_proceeding')],
-        [InlineKeyboardButton('По признанию и исполнению решений инсторанных содов',
+        [InlineKeyboardButton('По признанию и исполнению решений иностранных содов',
                               callback_data='acknowledge_proceeding')],
         [InlineKeyboardButton('По выдаче исполнительного документа на исполнение решения третейского суда,'
                               ' медиативного соглашения', callback_data='executive_doc_proceeding')],
         [InlineKeyboardButton('По обеспечению иска, рассматриваемого третейским судом, '
-                              'медиавтивного соглашения', callback_data='securing_proceeding')],
+                              'медиативного соглашения', callback_data='securing_proceeding')],
         [InlineKeyboardButton('По отмене решений третейских, арбитражных судов',
                               callback_data='appeal_arbitration_proceeding')]
     ]
@@ -118,6 +120,7 @@ def choose_type_of_legal_proceeding_1in(update: Update, _) -> int:
 
 
 def choose_type_of_legal_proceeding_app(update: Update, _) -> int:
+    """ type_court -> instance (appeal) -> legal_proceeding """
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         # del order
@@ -137,7 +140,7 @@ def choose_type_of_legal_proceeding_app(update: Update, _) -> int:
         [InlineKeyboardButton('По выдаче исполнительного документа на исполнение решения третейского суда,'
                               ' медиативного соглашения', callback_data='executive_doc_proceeding')],
         [InlineKeyboardButton('По обеспечению иска, рассматриваемого третейским судом, '
-                              'медиавтивного соглашения', callback_data='securing_proceeding')],
+                              'медиативного соглашения', callback_data='securing_proceeding')],
         [InlineKeyboardButton('По отмене решений третейских, арбитражных судов',
                               callback_data='appeal_arbitration_proceeding')]
     ]
@@ -155,6 +158,7 @@ def choose_type_of_legal_proceeding_app(update: Update, _) -> int:
 
 
 def choose_type_of_legal_proceeding_cas_sup(update: Update, _) -> int:
+    """ type_court -> instance (cassation, supervisory) -> legal_proceeding """
     keyboard = [
         [InlineKeyboardButton('Исковое производство', callback_data='lawsuit_proceeding')],
         # del order
@@ -170,12 +174,12 @@ def choose_type_of_legal_proceeding_cas_sup(update: Update, _) -> int:
                               callback_data='appeal_claim_proceeding')],
         [InlineKeyboardButton('По обжалованию действий (бездействия) судебного исполнителя',
                               callback_data='appeal_bailiff_proceeding')],
-        [InlineKeyboardButton('По признанию и исполнению решений инсторанных содов',
+        [InlineKeyboardButton('По признанию и исполнению решений иностранных содов',
                               callback_data='acknowledge_proceeding')],
         [InlineKeyboardButton('По выдаче исполнительного документа на исполнение решения третейского суда,'
                               ' медиативного соглашения', callback_data='executive_doc_proceeding')],
         [InlineKeyboardButton('По обеспечению иска, рассматриваемого третейским судом, '
-                              'медиавтивного соглашения', callback_data='securing_proceeding')],
+                              'медиативного соглашения', callback_data='securing_proceeding')],
         [InlineKeyboardButton('По отмене решений третейских, арбитражных судов',
                               callback_data='appeal_arbitration_proceeding')]
     ]
@@ -193,6 +197,7 @@ def choose_type_of_legal_proceeding_cas_sup(update: Update, _) -> int:
 
 
 def choose_type_of_ruling_on_administrative_case(update: Update, _) -> int:
+    """ type_court -> instance (administrative) -> ruling_on_ac """
     keyboard = [
         [InlineKeyboardButton('О наложение штрафа', callback_data='fine')],
         [InlineKeyboardButton('О наложении иного административного взыскания', callback_data='other_penalty')],
@@ -214,6 +219,7 @@ def choose_type_of_ruling_on_administrative_case(update: Update, _) -> int:
 
 
 def choose_type_of_another_procedural_action(update: Update, _) -> int:
+    """ type_court -> instance (other) -> another_action """
     keyboard = [
         [InlineKeyboardButton('Рассмотрение иной жалобы', callback_data='another_complaint')],
         [InlineKeyboardButton('Выдача судом дубликатов, копий документов', callback_data='get_documents')]
@@ -232,6 +238,7 @@ def choose_type_of_another_procedural_action(update: Update, _) -> int:
 
 
 def choose_type_of_nature_of_claim(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) -> legal_proceeding (lawsuit) -> claim """
     keyboard = [
         [InlineKeyboardButton('Требование имущественного характера', callback_data='property_claim')],
         [InlineKeyboardButton('Требование о привлечении к субсидиарной ответственности по долгам юридического лица',
@@ -257,6 +264,11 @@ def choose_type_of_nature_of_claim(update: Update, _) -> int:
 
 
 def choose_subject(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) ->
+                    [legal_proceeding (lawsuit) -> claim (non-pecuniary_claim)] or
+                     [legal_proceeding (appeal_NNLA_proceeding, administrative_proceeding, appeal_claim_proceeding,
+                        appeal_bailiff_proceeding)] ->
+            subject """
     keyboard = [
         [InlineKeyboardButton('Юридическое лицо', callback_data='entity')],
         [InlineKeyboardButton('Индивидуальный предприниматель',
@@ -288,6 +300,14 @@ def choose_subject(update: Update, _) -> int:
 
 
 def choose_court(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) ->
+                        [[legal_proceeding (lawsuit) -> claim (non-pecuniary_claim)] or
+                            [legal_proceeding (appeal_NNLA_proceeding, administrative_proceeding,
+                            appeal_claim_proceeding, appeal_bailiff_proceeding)] ->  subject] or
+                        [legal_proceeding (lawsuit) -> claim (contract_dispute)] or
+                        [legal_proceeding (special)] ->
+            court
+                        """
     keyboard = [
         [InlineKeyboardButton('Верховный Суд Республики Беларусь', callback_data='supreme_court')],
         [InlineKeyboardButton('Экономические суды областей (города Минска)',
@@ -320,7 +340,7 @@ def choose_court(update: Update, _) -> int:
     elif get_column_value(user_id, 'proceeding'):
         claim = update.callback_query.data
         add_column_value(user_id, 'claim', claim)
-        logger.info(f"User {user_id} has chosen nature of claimt - "
+        logger.info(f"User {user_id} has chosen nature of claim - "
                     f"{dict_claim[get_column_value(user_id, 'claim')]}")
         update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                      f"{dict_claim[get_column_value(user_id, 'claim')]}")
@@ -336,6 +356,8 @@ def choose_court(update: Update, _) -> int:
 
 
 def define_price_of_claim(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) -> legal_proceeding (lawsuit) ->
+            claim (property, quality_of_goods) -> price_of_claim """
     user_id = update.callback_query.from_user.id
     claim = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -352,6 +374,7 @@ def define_price_of_claim(update: Update, _) -> int:
 
 
 def define_amount_for_order_proceeding(update: Update, _) -> int:
+    """ type_court -> instance (first) -> legal_proceeding (order) -> amount_for_order """
     user_id = update.callback_query.from_user.id
     proceeding = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -365,6 +388,7 @@ def define_amount_for_order_proceeding(update: Update, _) -> int:
 
 
 def define_fine(update: Update, _) -> int:
+    """ type_court -> instance (administrative) -> ruling_on_ac (fine) -> fine """
     user_id = update.callback_query.from_user.id
     ruling_on_adm = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -377,7 +401,7 @@ def define_fine(update: Update, _) -> int:
                                              '<i>В случае, если на день расчёта государственной пошлины установлен иной'
                                              f' размер базовой величины ({base_value} BYN), по сравнению с тем, который'
                                              f' существовал на день'
-                                             ' наложения административного взыскания в виде штрафа, дполнительно '
+                                             ' наложения административного взыскания в виде штрафа, дополнительно '
                                              'укажите размер базовой величины, существовавшей на день наложения '
                                              'взыскания в формате:\n\n <b>штраф=базовая_величина (например, 290=29)'
                                              '</b></i>\n\n'
@@ -387,6 +411,7 @@ def define_fine(update: Update, _) -> int:
 
 
 def define_number_of_documents(update: Update, _) -> int:
+    """ type_court -> instance (other) -> another_action (get_documents) -> number_of_documents """
     user_id = update.callback_query.from_user.id
     another_action = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -400,6 +425,8 @@ def define_number_of_documents(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) -> legal_proceeding (lawsuit) ->
+                claim (property, quality_of_goods) -> price_of_claim  -> state_duty_property """
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the price of the claim - {update.message.text}")
     try:
@@ -416,6 +443,7 @@ def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_for_order_claim(update: Update, _) -> int:
+    """ type_court -> instance (first) -> legal_proceeding (order) -> amount_for_order -> state_duty_order """
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified amount of recovery - {update.message.text}")
     try:
@@ -432,6 +460,7 @@ def determine_size_of_state_duty_for_order_claim(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> int:
+    """ type_court -> instance (administrative) -> ruling_on_ac (fine) -> fine -> state_duty_ac"""
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the size of fine - {update.message.text}")
     convert_b_v = base_value
@@ -467,6 +496,7 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
 
 
 def determine_size_of_state_duty_for_get_documents(update: Update, _) -> int:
+    """ type_court -> instance (other) -> another_action (get_documents) -> number_of_documents -> state_duty_doc """
     user_id = update.message.from_user.id
     logger.info(f"User {user_id} has specified the number of pages - {update.message.text}")
     try:
@@ -483,6 +513,7 @@ def determine_size_of_state_duty_for_get_documents(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x05(update: Update, _) -> int:
+    """ type_court -> instance (other) -> another_action (another_complaint) -> state_duty_05 """
     user_id = update.callback_query.from_user.id
     another_action = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -499,6 +530,7 @@ def determine_size_of_state_duty_x05(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x1(update: Update, _) -> int:
+    """ type_court -> instance (administrative) -> ruling_on_ac (other_penalty, non_penalty) -> state_duty_1 """
     user_id = update.callback_query.from_user.id
     ruling_on_adm = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -515,6 +547,11 @@ def determine_size_of_state_duty_x1(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x5(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) ->
+                            [legal_proceeding (lawsuit) -> claim (non-pecuniary_claim)] or
+                                [legal_proceeding (appeal_NNLA_proceeding, administrative_proceeding,
+                                appeal_claim_proceeding, appeal_bailiff_proceeding) ->  subject (individual) ->
+                state_duty_5 """
     user_id = update.callback_query.from_user.id
     subject = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -532,6 +569,15 @@ def determine_size_of_state_duty_x5(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x10(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) ->
+                              [[legal_proceeding (lawsuit) -> claim (non-pecuniary_claim)] or
+                                  [legal_proceeding (appeal_NNLA_proceeding, administrative_proceeding,
+                                  appeal_claim_proceeding, appeal_bailiff_proceeding) ->
+                                                                                subject (individual_entrepreneur)]] or
+                              [legal_proceeding (special) -> court (regional)] or
+                              [legal_proceeding(appeal_notarial, appeal_arbitration, executive_doc, securing,
+                                                                                                    acknowledge)] ->
+                  state_duty_10 """
     user_id = update.callback_query.from_user.id
     counter = get_new_counter_value(user_id)
     if get_column_value(user_id, 'claim'):
@@ -571,6 +617,8 @@ def determine_size_of_state_duty_x10(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x15(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) -> [legal_proceeding (special) ->
+                court (supreme)] -> state_duty_15 """
     user_id = update.callback_query.from_user.id
     court = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -588,6 +636,14 @@ def determine_size_of_state_duty_x15(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x20(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) ->
+                                [[legal_proceeding (lawsuit) -> claim (non-pecuniary_claim)] or
+                                 [legal_proceeding (appeal_NNLA_proceeding, administrative_proceeding,
+                                  appeal_claim_proceeding, appeal_bailiff_proceeding) ->
+                                                                             subject (individual_entrepreneur)]] - >
+                                            subject (entity) or
+                                [legal_proceeding (lawsuit) -> claim (contract_dispute)] ->
+             court (regional) -> state_duty_20 """
     user_id = update.callback_query.from_user.id
     court = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -605,6 +661,8 @@ def determine_size_of_state_duty_x20(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x25(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) -> legal_proceeding (lawsuit) ->
+            claim (subsidiary_liability) -> state_duty_25 """
     user_id = update.callback_query.from_user.id
     claim = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -622,6 +680,14 @@ def determine_size_of_state_duty_x25(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_x50(update: Update, _) -> int:
+    """ type_court -> instance (first, appeal, cassation, supervisory) ->
+                                    [[legal_proceeding (lawsuit) -> claim (non-pecuniary_claim)] or
+                                     [legal_proceeding (appeal_NNLA_proceeding, administrative_proceeding,
+                                      appeal_claim_proceeding, appeal_bailiff_proceeding) ->
+                                                                                subject (individual_entrepreneur)]] ->
+                                                subject (entity) or
+                                    [legal_proceeding (lawsuit) -> claim (contract_dispute)] ->
+                 court (supreme) -> state_duty_20 """
     user_id = update.callback_query.from_user.id
     court = update.callback_query.data
     counter = get_new_counter_value(user_id)
@@ -639,6 +705,7 @@ def determine_size_of_state_duty_x50(update: Update, _) -> int:
 
 
 def determine_size_of_state_duty_for_newly_facts(update: Update, _) -> int:
+    """ type_court -> instance (newly_facts) -> state_duty_nf """
     user_id = update.callback_query.from_user.id
     instance = update.callback_query.data
     counter = get_new_counter_value(user_id)

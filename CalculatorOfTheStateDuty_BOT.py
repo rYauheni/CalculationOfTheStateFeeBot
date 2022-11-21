@@ -30,7 +30,7 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
 
 from status_log_db.bot_status_log_db import (
     create_table,
-    add_new_raw,
+    add_new_row,
     add_column_value
 )
 
@@ -75,7 +75,7 @@ def start(update: Update, _) -> int:
     user_id = update.message.from_user.id
     print(user_id)
     print(user_name)
-    add_new_raw(user_id)
+    add_new_row(user_id)  # if raw with current user_id exists all values in this row (except user_id value) will clear
     add_column_value(user_id, 'user_name', user_name)
     add_column_value(user_id, 'counter', '0')
 

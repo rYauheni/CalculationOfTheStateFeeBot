@@ -38,7 +38,7 @@ def get_column_value(user_id: int, column_name: str) -> list[tuple[str]]:
         return []
 
 
-def add_new_raw(user_id: int):
+def add_new_row(user_id: int):
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
         data = get_column_value(user_id, 'user_id')

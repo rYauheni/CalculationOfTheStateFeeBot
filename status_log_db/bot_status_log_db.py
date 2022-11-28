@@ -1,3 +1,8 @@
+"""
+The module contains a set of functions that describe the SQL requests needed to keep a log of user actions
+when working with the Bot
+"""
+
 import sqlite3
 
 table = 'status_log'
@@ -5,6 +10,10 @@ data_base = 'status_log.db'
 
 
 def create_table():
+    """
+    Creates a table in the database to status log user actions (only if no table has been created)
+    :return: None
+    """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
         query = f""" CREATE TABLE IF NOT EXISTS '{table}'(
@@ -27,6 +36,13 @@ def create_table():
 
 
 def get_column_value(user_id: int, column_name: str) -> list[tuple[str]]:
+    """
+    Returns the field value of the user status log table based on the user id and column name as a list
+    (if the field value is NULL, an empty list is returned)
+    :param user_id: int
+    :param column_name: str
+    :return: list
+    """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
         query = f"SELECT {column_name} FROM '{table}' WHERE user_id = {user_id};"
@@ -39,6 +55,12 @@ def get_column_value(user_id: int, column_name: str) -> list[tuple[str]]:
 
 
 def add_new_row(user_id: int):
+    """
+    Creates a status log table row for a new user based on user id if the user has not previously used the Bot.
+    Otherwise, calls the cleanup function, which clears (passes NULL) all fields of the row except the id and user_id
+    :param user_id:
+    :return: None
+    """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
         data = get_column_value(user_id, 'user_id')
@@ -51,6 +73,14 @@ def add_new_row(user_id: int):
 
 
 def add_column_value(user_id: int, column_name: str, value: str):
+    """
+    Fills the corresponding log table field based on the user id, column name, and the value passed.
+    Raise an exception if a row with the corresponding user id does not exist
+    :param user_id: int
+    :param column_name: str
+    :param value: str
+    :return: None
+    """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
         data = get_column_value(user_id, 'user_id')
@@ -63,6 +93,14 @@ def add_column_value(user_id: int, column_name: str, value: str):
 
 
 def get_new_counter_value(user_id):
+    """
+    Increments the value of the user action counter on each function call based on the user ID
+    and returns new counter value.
+    Necessary for numbering user actions when displaying to the user his sequence of actions.
+    Raise an exception if a row with the corresponding user id does not exist
+    :param user_id: int
+    :return: int
+    """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
         data = get_column_value(user_id, 'counter')
@@ -76,6 +114,11 @@ def get_new_counter_value(user_id):
 
 
 def clear_values(user_id: int):
+    """
+    Clears (passes NULL) the value of all status log table fields except id and user_id based on user id
+    :param user_id: int
+    :return: None
+    """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
         query = f""" UPDATE '{table}'
@@ -97,6 +140,11 @@ def clear_values(user_id: int):
 
 
 def delete_row(user_id: int):
+    """
+    Deletes a table row of status log table corresponding to the user id
+    :param user_id: int
+    :return: None
+    """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
         query = f"DELETE FROM '{table}' WHERE user_id = {user_id};"

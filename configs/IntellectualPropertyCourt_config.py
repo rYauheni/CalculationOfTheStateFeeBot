@@ -61,8 +61,7 @@ def choose_instance_ipc(update: Update, _) -> int:
     type_court = update.callback_query.data
     counter = get_new_counter_value(user_id)
     add_column_value(user_id, 'type_court', type_court)
-    logger.info(f"User {user_id} has chosen the type of the court "
-                f"- {dict_type_court[get_column_value(user_id, 'type_court')]}")
+    logger.info(f"User {user_id} has chosen the type of the court - {get_column_value(user_id, 'type_court')}")
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_type_court[get_column_value(user_id, 'type_court')]} *\n\n"
                                                  f"<i>* При обращении <b>нерезидентов</b> в судебную коллегию по делам"
@@ -86,8 +85,7 @@ def choose_type_of_legal_proceeding(update: Update, _) -> int:
     instance = update.callback_query.data
     counter = get_new_counter_value(user_id)
     add_column_value(user_id, 'instance', instance)
-    logger.info(f"User {user_id} has chosen instance -"
-                f" {dict_instance[get_column_value(user_id, 'instance')]}")
+    logger.info(f"User {user_id} has chosen instance - {get_column_value(user_id, 'instance')}")
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_instance[get_column_value(user_id, 'instance')]}")
     return IPC_PROCEEDING
@@ -106,8 +104,7 @@ def choose_type_of_another_procedural_action(update: Update, _) -> int:
     instance = update.callback_query.data
     counter = get_new_counter_value(user_id)
     add_column_value(user_id, 'instance', instance)
-    logger.info(f"User {user_id} has chosen instance -"
-                f" {dict_instance[get_column_value(user_id, 'instance')]}")
+    logger.info(f"User {user_id} has chosen instance - {get_column_value(user_id, 'instance')}")
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_instance[get_column_value(user_id, 'instance')]}")
     return IPC_OTHER
@@ -127,8 +124,7 @@ def choose_type_of_nature_of_claim(update: Update, _) -> int:
     proceeding = update.callback_query.data
     counter = get_new_counter_value(user_id)
     add_column_value(user_id, 'proceeding', proceeding)
-    logger.info(f"User {user_id} has chosen legal proceeding -"
-                f" {dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+    logger.info(f"User {user_id} has chosen legal proceeding - {get_column_value(user_id, 'proceeding')}")
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
     return IPC_CLAIM
@@ -156,16 +152,14 @@ def choose_subject(update: Update, _) -> int:
         if get_column_value(user_id, 'proceeding') and get_column_value(user_id, 'proceeding') == 'lawsuit_proceeding':
             claim = update.callback_query.data
             add_column_value(user_id, 'claim', claim)
-            logger.info(f"User {user_id} has chosen nature of claim - "
-                        f"{dict_claim[get_column_value(user_id, 'claim')]}")
+            logger.info(f"User {user_id} has chosen nature of claim - {get_column_value(user_id, 'claim')}")
             update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                          f"{dict_claim[get_column_value(user_id, 'claim')]}")
         elif get_column_value(user_id, 'instance') and \
                 get_column_value(user_id, 'instance') in ('first_instance', 'supervisory'):
             proceeding = update.callback_query.data
             add_column_value(user_id, 'proceeding', proceeding)
-            logger.info(f"User {user_id} has chosen legal proceeding - "
-                        f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
+            logger.info(f"User {user_id} has chosen legal proceeding - {get_column_value(user_id, 'proceeding')}")
             update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                          f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
         return IPC_SUBJECT_1
@@ -175,7 +169,7 @@ def choose_subject(update: Update, _) -> int:
         update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                      f"{dict_other[get_column_value(user_id, 'another_action')]}")
         logger.info(f"User {user_id} has chosen another procedural action - "
-                    f"{dict_other[get_column_value(user_id, 'another_action')]}")
+                    f"{get_column_value(user_id, 'another_action')}")
         return IPC_SUBJECT_2
 
 
@@ -187,8 +181,7 @@ def define_amount(update: Update, _) -> int:
     add_column_value(user_id, 'claim', claim)
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_claim[get_column_value(user_id, 'claim')]}")
-    logger.info(f"User {user_id} has chosen nature of claim - "
-                f"{dict_claim[get_column_value(user_id, 'claim')]}")
+    logger.info(f"User {user_id} has chosen nature of claim - {get_column_value(user_id, 'claim')}")
 
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
@@ -204,8 +197,7 @@ def define_number_of_pages_court_order(update: Update, _) -> int:
     add_column_value(user_id, 'subject', subject)
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_subject[get_column_value(user_id, 'subject')]}")
-    logger.info(f"User {user_id} has chosen another procedural action - "
-                f"{dict_subject[get_column_value(user_id, 'subject')]}")
+    logger.info(f"User {user_id} has chosen another procedural action - {get_column_value(user_id, 'subject')}")
     update.callback_query.message.reply_text('Укажите количество страниц копии(й) судебного(ых) постановления(ий), '
                                              'подлежащих изготовлению:')
     return IPC_DUTY_COURT_ORDER
@@ -261,8 +253,7 @@ def determine_size_of_state_duty_x05(update: Update, _) -> int:
     add_column_value(user_id, 'another_action', another_action)
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_other[get_column_value(user_id, 'another_action')]}")
-    logger.info(f"User {user_id} has chosen another procedural action - "
-                f"{dict_other[get_column_value(user_id, 'another_action')]}")
+    logger.info(f"User {user_id} has chosen another procedural action - {get_column_value(user_id, 'another_action')}")
     state_duty = float(Decimal(str(base_value * 0.5)).quantize(Decimal('1.00'), ROUND_HALF_UP))
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
@@ -278,7 +269,7 @@ def determine_size_of_state_duty_x20(update: Update, _) -> int:
     add_column_value(user_id, 'subject', subject)
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_subject[get_column_value(user_id, 'subject')]}")
-    logger.info(f"User {user_id} has chosen subject - {dict_subject[get_column_value(user_id, 'subject')]}")
+    logger.info(f"User {user_id} has chosen subject - {get_column_value(user_id, 'subject')}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     state_duty = float(Decimal(str(base_value * 20 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
@@ -296,7 +287,7 @@ def determine_size_of_state_duty_x50(update: Update, _) -> int:
     add_column_value(user_id, 'subject', subject)
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_subject[get_column_value(user_id, 'subject')]}")
-    logger.info(f"User {user_id} has chosen subject - {dict_subject[get_column_value(user_id, 'subject')]}")
+    logger.info(f"User {user_id} has chosen subject - {get_column_value(user_id, 'subject')}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
     state_duty = float(Decimal(str(base_value * 50 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
@@ -313,7 +304,7 @@ def determine_size_of_state_duty_for_newly_facts(update, _):
     add_column_value(user_id, 'instance', instance)
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_instance[get_column_value(user_id, 'instance')]}")
-    logger.info(f"User {user_id} has chosen an instance - {dict_instance[get_column_value(user_id, 'instance')]}")
+    logger.info(f"User {user_id} has chosen an instance - {get_column_value(user_id, 'instance')}")
     update.callback_query.message.reply_text('Освобождаются от государственной пошлины при обращении в суд организации '
                                              'и физические лица за рассмотрение  заявления о пересмотре (возобновлении)'
                                              ' дела по вновь открывшимся обстоятельствам\n'

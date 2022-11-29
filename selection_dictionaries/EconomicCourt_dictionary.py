@@ -1,3 +1,9 @@
+"""
+This module contains the responses (text messages) that are returned to the user when a certain option is selected
+when using the Bot in the EconomicCourt branch.
+The value of the response is determined based on the data of the table status log in the database.
+"""
+
 dict_instance = {
     'first_instance': 'Производство в суде первой инстанции',
     'appeal': 'Производство в суде апелляционной инстанции',

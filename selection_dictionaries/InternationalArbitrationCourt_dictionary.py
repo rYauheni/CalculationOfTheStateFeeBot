@@ -1,3 +1,9 @@
+"""
+This module contains the responses (text messages) that are returned to the user when a certain option is selected
+when using the Bot in the InternationalArbitrationCourt branch.
+The value of the response is determined based on the data of the table status log in the database.
+"""
+
 dict_subject = {
     'resident': 'Спор между субъектами, местонахождение или местожительство каждого из которых находится '
                 'в Республике Беларусь',

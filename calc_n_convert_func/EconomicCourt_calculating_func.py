@@ -1,7 +1,20 @@
+"""
+The module contains calculating functions for EconomicCourt branch.
+The calculating functions calculate the reduction coefficient for state duty and
+the amount of the state duty in the case when the amount of the state duty depends on the size of the value.
+"""
+
 from status_log_db.bot_status_log_db import get_column_value
 
 
 def calculate_coefficient(user_id: int) -> float:
+    """
+    The function defines and returns the size of the reduction coefficient in cases specified
+    in the Tax Code of the Republic of Belarus
+    (for appeal, casstion and supervisory instances and for disputes about the quality of the delivered goods)
+    :param user_id: int
+    :return: float
+    """
     coefficient = 1.0
     if get_column_value(user_id, 'instance') and \
             get_column_value(user_id, 'instance') in {'appeal', 'cassation', 'supervisory'}:
@@ -12,6 +25,14 @@ def calculate_coefficient(user_id: int) -> float:
 
 
 def calculating_state_duty_for_property(claim_price: float, base_value: float, user_id: int) -> float:
+    """
+    The function calculates and returns the amount of the state duty for lawsuit proceeding (property claims)
+    based on the claim price entered by the user, taking into account the coefficient
+    :param claim_price: float
+    :param base_value: float
+    :param user_id: int
+    :return: float
+    """
     coefficient = calculate_coefficient(user_id)
     if 0 <= claim_price * 0.05 < base_value * 25:
         return base_value * 25 * coefficient
@@ -28,6 +49,13 @@ def calculating_state_duty_for_property(claim_price: float, base_value: float, u
 
 
 def calculating_state_duty_for_order(amount_of_recovery: float, base_value: float) -> float:
+    """
+    The function calculates and returns the amount of the state duty for order proceeding
+    based on the amount of recovery entered by the user, taking into account the coefficient
+    :param amount_of_recovery: float
+    :param base_value: float
+    :return: float
+    """
     # del coefficient
     if 0 <= amount_of_recovery < base_value * 100:
         return base_value * 2
@@ -40,6 +68,14 @@ def calculating_state_duty_for_order(amount_of_recovery: float, base_value: floa
 
 
 def calculating_state_duty_for_administrative_case(fine: float, b_v: float, base_value: float) -> float:
+    """
+    The function calculates and returns the amount of the state duty for administrative cases
+    based on the size of fine [size of base value] entered by the user
+    :param fine: float
+    :param b_v: float
+    :param base_value: float
+    :return: float
+    """
     if 0 <= fine < b_v * 10:
         return base_value * 0.5
     elif b_v * 10 <= fine < b_v * 100:
@@ -51,6 +87,13 @@ def calculating_state_duty_for_administrative_case(fine: float, b_v: float, base
 
 
 def calculating_state_duty_for_get_documents(pages: int, base_value: float) -> float:
+    """
+    The function calculates and returns the amount of the state duty for get documents
+    based on the number of pages entered by the user
+    :param pages: float
+    :param base_value: float
+    :return: float
+    """
     if isinstance(pages, int) and pages >= 0:
         return base_value * 0.2 + pages * base_value * 0.03
     else:

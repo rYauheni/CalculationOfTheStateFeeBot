@@ -22,7 +22,9 @@ The calculation of the state duty (arbitration fee) is approximate.
 The calculation made by this bot CAN NOT be used as evidence in court and DOES NOT HAVE legal force.
 """
 
+import os
 import logging
+from dotenv import load_dotenv
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 
@@ -51,6 +53,9 @@ from handlers.IntellectualPropertyCourt_handler import ipc_conv_handler_dict
 from handlers.InternationalArbitrationCourt_handler import iac_conv_handler_dict
 
 from CSDB_index import TYPE_COURT
+
+load_dotenv()
+TOKEN = os.environ.get('TOKEN')
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -113,7 +118,7 @@ def select_actions_dict() -> dict:
 
 
 def main():
-    updater = Updater("5675091266:AAHbP-X6DxIrQ5FqXwkn9Nt03ayzA74CP1Y")
+    updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('start', start)],

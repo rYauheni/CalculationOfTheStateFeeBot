@@ -44,8 +44,6 @@ from configs.IntellectualPropertyCourt_config import choose_instance_ipc
 
 from configs.InternationalArbitrationCourt_config import choose_subject_iac
 
-from configs.Feedback_config import save_feedback
-
 from handlers.EconomicCourt_handler import ec_conv_handler_dict
 
 from handlers.OrdinaryCourt_handler import oc_conv_handler_dict

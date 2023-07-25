@@ -12,7 +12,7 @@ table_feedback = 'feedback'
 
 def create_table(table):
     """
-    Creates a table in the database to status log user actions (only if no table has been created)
+    Creates a table in the database to status log user actions or for user feedback (only if no table has been created)
     :return: None
     """
     if table == 'status_log':
@@ -99,7 +99,7 @@ def add_new_row(user_id: int, table: str = table_status_log):
 
 def add_column_value(user_id: int, column_name: str, value: str, table: str = table_status_log):
     """
-    Fills the corresponding table field based on the user id, column name, and the value passed.
+    Fills the corresponding table field based on the table name, user id, column name, and the value passed.
     Raise an exception if a row with the corresponding user id does not exist
     :param user_id: int
     :param column_name: str
@@ -109,7 +109,7 @@ def add_column_value(user_id: int, column_name: str, value: str, table: str = ta
     """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
-        data = get_column_value(user_id, 'user_id', table)  ## ADD!!!!!!!!!!
+        data = get_column_value(user_id, 'user_id', table)
         if data:
             if table == table_status_log:
                 query = f"UPDATE '{table_status_log}' SET {column_name} = '{value}' WHERE user_id = {user_id};"

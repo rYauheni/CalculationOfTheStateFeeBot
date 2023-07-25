@@ -15,3 +15,6 @@ TYPE_COURT = 1
 
 # InternationalArbitrationCourt branch
 (IAC_SUBJECT, IAC_PROCEEDING, IAC_INSTANCE, IAC_CLAIM, IAC_A_FEE_PROPERTY) = range(401, 406)
+
+# Feedback branch
+FEEDBACK = 10_001

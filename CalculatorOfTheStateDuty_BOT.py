@@ -44,6 +44,8 @@ from configs.IntellectualPropertyCourt_config import choose_instance_ipc
 
 from configs.InternationalArbitrationCourt_config import choose_subject_iac
 
+from configs.Feedback_config import save_feedback
+
 from handlers.EconomicCourt_handler import ec_conv_handler_dict
 
 from handlers.OrdinaryCourt_handler import oc_conv_handler_dict
@@ -52,7 +54,9 @@ from handlers.IntellectualPropertyCourt_handler import ipc_conv_handler_dict
 
 from handlers.InternationalArbitrationCourt_handler import iac_conv_handler_dict
 
-from CSDB_index import TYPE_COURT
+from handlers.Feedback_handler import feedback_conv_handler_dict
+
+from CSDB_index import TYPE_COURT, FEEDBACK
 
 load_dotenv()
 TOKEN = os.environ.get('TOKEN')
@@ -64,7 +68,7 @@ logger = logging.getLogger(__name__)
 
 
 def start(update: Update, _) -> int:
-    create_table()
+    create_table('status_log')
     keyboard = [
         [InlineKeyboardButton('Суд общей юрисдикции', callback_data='ordinary_court')],
         [InlineKeyboardButton('Суд по делам интеллектуальной собственности',
@@ -103,6 +107,17 @@ def info(update: Update, _):
     update.message.reply_text('info_check')
 
 
+def feedback(update: Update, _):
+    create_table('feedback')
+    update.message.reply_text('Вы можете помочь улучшить работу Бота, оставив здесь пожелания и предложения:')
+    user_name = update.message.from_user.first_name
+    user_id = update.message.from_user.id
+    add_new_row(user_id, 'feedback')
+    add_column_value(user_id, 'user_name', user_name, 'feedback')
+    logger.info(f"User {user_id} started to leave feedback")
+    return FEEDBACK
+
+
 def select_actions_dict() -> dict:
     base_dict = {TYPE_COURT: [
         CallbackQueryHandler(choose_instance_oc, pattern="^" + 'ordinary_court' + "$"),
@@ -128,6 +143,12 @@ def main():
     dispatcher.add_handler(conv_handler)
     info_handler = CommandHandler('info', info)
     dispatcher.add_handler(info_handler)
+    feedback_handler = ConversationHandler(
+        entry_points=[CommandHandler('feedback', feedback)],
+        states=feedback_conv_handler_dict,
+        fallbacks=[CommandHandler('cancel', cancel)]
+    )
+    dispatcher.add_handler(feedback_handler)
     updater.start_polling()
     updater.idle()
 

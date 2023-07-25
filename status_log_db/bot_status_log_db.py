@@ -5,42 +5,57 @@ when working with the Bot
 
 import sqlite3
 
-table = 'status_log'
 data_base = 'status_log.db'
+table_status_log = 'status_log'
+table_feedback = 'feedback'
 
 
-def create_table():
+def create_table(table):
     """
     Creates a table in the database to status log user actions (only if no table has been created)
     :return: None
     """
-    with sqlite3.connect(f'{data_base}') as db:
-        cursor = db.cursor()
-        query = f""" CREATE TABLE IF NOT EXISTS '{table}'(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id TEXT,
-            user_name TEXT,
-            type_court TEXT,
-            instance TEXT,
-            proceeding TEXT,
-            criminal TEXT,
-            claim TEXT,
-            criminal_order TEXT,
-            subject TEXT,
-            court TEXT,
-            ruling_on_adm TEXT,
-            another_action TEXT,
-            counter INT); """
-        cursor.execute(query)
-        db.commit()
+    if table == 'status_log':
+        with sqlite3.connect(f'{data_base}') as db:
+            cursor = db.cursor()
+            query = f""" CREATE TABLE IF NOT EXISTS '{table_status_log}'(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT,
+                user_name TEXT,
+                type_court TEXT,
+                instance TEXT,
+                proceeding TEXT,
+                criminal TEXT,
+                claim TEXT,
+                criminal_order TEXT,
+                subject TEXT,
+                court TEXT,
+                ruling_on_adm TEXT,
+                another_action TEXT,
+                counter INT); """
+            cursor.execute(query)
+            db.commit()
+    elif table == 'feedback':
+        with sqlite3.connect(f'{data_base}') as db:
+            cursor = db.cursor()
+            query = f""" CREATE TABLE IF NOT EXISTS '{table_feedback}'(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id TEXT,
+                user_name TEXT,
+                feedback TEXT); """
+            cursor.execute(query)
+            db.commit()
+    else:
+        raise ValueError('Table name (value) must be <status_log> or <feedback>.')
 
 
-def get_column_value(user_id: int, column_name: str) -> list[tuple[str]]:
+def get_column_value(user_id: int, column_name: str, table: str = table_status_log) -> list[tuple[str]]:
     """
-    Returns the field value of the user status log table based on the user id and column name as a list
+    Returns the field value from the table based on the table name, user id and column name as a list
     (if the field value is NULL, an empty list is returned)
     :param user_id: int
     :param column_name: str
+    :param table: str
     :return: list
     """
     with sqlite3.connect(f'{data_base}') as db:
@@ -54,38 +69,55 @@ def get_column_value(user_id: int, column_name: str) -> list[tuple[str]]:
         return []
 
 
-def add_new_row(user_id: int):
+def add_new_row(user_id: int, table: str = table_status_log):
     """
-    Creates a status log table row for a new user based on user id if the user has not previously used the Bot.
-    Otherwise, calls the cleanup function, which clears (passes NULL) all fields of the row except the id and user_id
+    Creates a table row for a new user based on user id if the user has not previously recorded.
+    For feedback table new row creates anyway.
+    Otherwise, if table is status_log calls the cleanup function,
+    which clears (passes NULL) all fields of the row except the id and user_id.
     :param user_id:
+    :param table: str
     :return: None
     """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
-        data = get_column_value(user_id, 'user_id')
-        if not data:
+        if table == table_status_log:
+            data = get_column_value(user_id, 'user_id', table)
+            if not data:
+                query = f"INSERT INTO '{table}' (user_id) VALUES ({user_id});"
+                cursor.execute(query)
+                db.commit()
+            else:
+                clear_values(user_id)
+        elif table == table_feedback:
             query = f"INSERT INTO '{table}' (user_id) VALUES ({user_id});"
             cursor.execute(query)
             db.commit()
         else:
-            clear_values(user_id)
+            raise ValueError('Table name (value) must be <status_log> or <feedback>.')
 
 
-def add_column_value(user_id: int, column_name: str, value: str):
+def add_column_value(user_id: int, column_name: str, value: str, table: str = table_status_log):
     """
-    Fills the corresponding log table field based on the user id, column name, and the value passed.
+    Fills the corresponding table field based on the user id, column name, and the value passed.
     Raise an exception if a row with the corresponding user id does not exist
     :param user_id: int
     :param column_name: str
     :param value: str
+    :param table: str
     :return: None
     """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
-        data = get_column_value(user_id, 'user_id')
+        data = get_column_value(user_id, 'user_id', table)  ## ADD!!!!!!!!!!
         if data:
-            query = f"UPDATE '{table}' SET {column_name} = '{value}' WHERE user_id = {user_id};"
+            if table == table_status_log:
+                query = f"UPDATE '{table_status_log}' SET {column_name} = '{value}' WHERE user_id = {user_id};"
+            elif table == table_feedback:
+                query = f"UPDATE '{table_feedback}' SET {column_name} = '{value}' " \
+                        f"WHERE id = (SELECT MAX(id) FROM '{table_feedback}' WHERE user_id = {user_id});"
+            else:
+                raise ValueError('Table name (value) must be <status_log> or <feedback>.')
             cursor.execute(query)
             db.commit()
         else:
@@ -105,7 +137,7 @@ def get_new_counter_value(user_id):
         cursor = db.cursor()
         data = get_column_value(user_id, 'counter')
         if str(data):
-            query = f"UPDATE '{table}' SET counter = counter + 1 WHERE user_id = {user_id};"
+            query = f"UPDATE '{table_status_log}' SET counter = counter + 1 WHERE user_id = {user_id};"
             cursor.execute(query)
             db.commit()
             return get_column_value(user_id, 'counter')
@@ -121,7 +153,7 @@ def clear_values(user_id: int):
     """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
-        query = f""" UPDATE '{table}'
+        query = f""" UPDATE '{table_status_log}'
                     SET user_name = NULL,
                             type_court = NULL,
                             instance = NULL,
@@ -147,6 +179,6 @@ def delete_row(user_id: int):
     """
     with sqlite3.connect(f'{data_base}') as db:
         cursor = db.cursor()
-        query = f"DELETE FROM '{table}' WHERE user_id = {user_id};"
+        query = f"DELETE FROM '{table_status_log}' WHERE user_id = {user_id};"
         cursor.execute(query)
         db.commit()

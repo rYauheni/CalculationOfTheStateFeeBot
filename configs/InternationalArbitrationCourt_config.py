@@ -33,7 +33,7 @@ from status_log_db.bot_status_log_db import (
 
 from CSDB_index import (IAC_SUBJECT, IAC_PROCEEDING, IAC_INSTANCE, IAC_CLAIM, IAC_A_FEE_PROPERTY)
 
-from BaseValue.base_value import base_value
+from settings.settings import BASE_VALUE
 
 note = '\n\n<i>*Арбитражный сбор определён без учёта его увеличения на сумму налога на добавленную стоимость.\n' \
        'Необходимость увеличения арбитражного сбора на сумму НДС следует уточнять в МАС</i>'
@@ -177,7 +177,7 @@ def determine_size_of_arbitration_fee_for_property_claim(update: Update, _) -> i
     else:
         if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'resident':
             arbitration_fee = calculating_arbitration_fee_for_property_for_resident(convert_claim_price,
-                                                                                    base_value, user_id)
+                                                                                    BASE_VALUE, user_id)
             arbitration_fee = float(Decimal(str(arbitration_fee)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер арбитражного сбора составляет:\n\n<b>{arbitration_fee}</b> BYN*{note}',
                                       parse_mode='HTML')
@@ -200,7 +200,7 @@ def determine_size_of_arbitration_fee_for_non_pecuniary_claim(update: Update, _)
                                                  f"{dict_claim[get_column_value(user_id, 'claim')]}")
 
     if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'resident':
-        arbitration_fee = float(Decimal(str(base_value * 50)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+        arbitration_fee = float(Decimal(str(BASE_VALUE * 50)).quantize(Decimal('1.00'), ROUND_HALF_UP))
         update.callback_query.message.reply_text(f'Размер арбитражного сбора составляет:\n\n'
                                                  f'<b>{arbitration_fee}</b> BYN*{note}', parse_mode='HTML')
     elif get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'non-resident':

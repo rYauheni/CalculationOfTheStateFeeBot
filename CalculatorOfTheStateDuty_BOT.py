@@ -30,6 +30,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, ConversationHandler
 
+from settings.settings import ACCESS
+
 from status_log_db.bot_status_log_db import (
     create_table,
     add_new_row,
@@ -66,28 +68,34 @@ logger = logging.getLogger(__name__)
 
 
 def start(update: Update, _) -> int:
-    create_table('status_log')
-    keyboard = [
-        [InlineKeyboardButton('Суд общей юрисдикции', callback_data='ordinary_court')],
-        [InlineKeyboardButton('Суд по делам интеллектуальной собственности',
-                              callback_data='intellectual_property_court')],
-        [InlineKeyboardButton('Экономический суд', callback_data='economic_court')],
-        [InlineKeyboardButton('Международный арбитражный суд при БелТПП',
-                              callback_data='international_arbitration_court')]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    if ACCESS:
+        create_table('status_log')
+        keyboard = [
+            [InlineKeyboardButton('Суд общей юрисдикции', callback_data='ordinary_court')],
+            [InlineKeyboardButton('Суд по делам интеллектуальной собственности',
+                                  callback_data='intellectual_property_court')],
+            [InlineKeyboardButton('Экономический суд', callback_data='economic_court')],
+            [InlineKeyboardButton('Международный арбитражный суд при БелТПП',
+                                  callback_data='international_arbitration_court')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.message.reply_text('Выберите судебную юрисдикцию:', reply_markup=reply_markup)
-    user_name = update.message.from_user.first_name
-    user_id = update.message.from_user.id
-    print(user_id)
-    print(user_name)
-    add_new_row(user_id)  # if raw with current user_id exists all values in this row (except user_id value) will clear
-    add_column_value(user_id, 'user_name', user_name)
-    add_column_value(user_id, 'counter', '0')
+        update.message.reply_text('Выберите судебную юрисдикцию:', reply_markup=reply_markup)
+        user_name = update.message.from_user.first_name
+        user_id = update.message.from_user.id
+        print(user_id)
+        print(user_name)
+        add_new_row(
+            user_id)  # if raw with current user_id exists all values in this row (except user_id value) will clear
+        add_column_value(user_id, 'user_name', user_name)
+        add_column_value(user_id, 'counter', '0')
 
-    logger.info(f"User {user_id} started to choose some instance")
-    return TYPE_COURT
+        logger.info(f"User {user_id} started to choose some instance")
+        return TYPE_COURT
+    else:
+        update.message.reply_text('В настоящий момент производятся технические работы.\n'
+                                  'Функция определения государственной пошлины временно недоступна.')
+        ConversationHandler.END
 
 
 def cancel(update: Update, _) -> int:

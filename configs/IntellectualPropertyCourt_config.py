@@ -37,7 +37,7 @@ from status_log_db.bot_status_log_db import (
 from CSDB_index import (IPC_INSTANCE, IPC_PROCEEDING, IPC_OTHER, IPC_CLAIM, IPC_SUBJECT_1, IPC_SUBJECT_2,
                         IPC_DUTY_PROPERTY, IPC_DUTY_COURT_ORDER)
 
-from BaseValue.base_value import base_value
+from settings.settings import BASE_VALUE
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
@@ -214,7 +214,7 @@ def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
     else:
-        state_duty = calculating_state_duty_for_property(convert_claim_price, base_value, user_id)
+        state_duty = calculating_state_duty_for_property(convert_claim_price, BASE_VALUE, user_id)
         state_duty = float(Decimal(str(state_duty)).quantize(Decimal('1.00'), ROUND_HALF_UP))
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
@@ -233,12 +233,12 @@ def determine_size_of_state_duty_for_get_copy_of_court_order(update: Update, _) 
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'entity':
-            state_duty = calculating_state_duty_for_get_copy_of_court_order_for_entity(convert_pages, base_value)
+            state_duty = calculating_state_duty_for_get_copy_of_court_order_for_entity(convert_pages, BASE_VALUE)
             state_duty = float(Decimal(str(state_duty)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                       parse_mode='HTML')
         elif get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'individual':
-            state_duty = calculating_state_duty_for_get_copy_of_court_order_for_individual(convert_pages, base_value)
+            state_duty = calculating_state_duty_for_get_copy_of_court_order_for_individual(convert_pages, BASE_VALUE)
             state_duty = float(Decimal(str(state_duty)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                       parse_mode='HTML')
@@ -254,7 +254,7 @@ def determine_size_of_state_duty_x05(update: Update, _) -> int:
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_other[get_column_value(user_id, 'another_action')]}")
     logger.info(f"User {user_id} has chosen another procedural action - {get_column_value(user_id, 'another_action')}")
-    state_duty = float(Decimal(str(base_value * 0.5)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = float(Decimal(str(BASE_VALUE * 0.5)).quantize(Decimal('1.00'), ROUND_HALF_UP))
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
@@ -272,7 +272,7 @@ def determine_size_of_state_duty_x20(update: Update, _) -> int:
     logger.info(f"User {user_id} has chosen subject - {get_column_value(user_id, 'subject')}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    state_duty = float(Decimal(str(base_value * 20 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = float(Decimal(str(BASE_VALUE * 20 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
@@ -290,7 +290,7 @@ def determine_size_of_state_duty_x50(update: Update, _) -> int:
     logger.info(f"User {user_id} has chosen subject - {get_column_value(user_id, 'subject')}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    state_duty = float(Decimal(str(base_value * 50 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = float(Decimal(str(BASE_VALUE * 50 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END

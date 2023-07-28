@@ -14,9 +14,9 @@ def calculate_coefficient(user_id: int) -> float:
 def calculating_state_duty_for_property_and_order(amount: float, base_value: float, user_id: int) -> float:
     coefficient = calculate_coefficient(user_id)
     if 0 <= amount * 0.05 < base_value * 2:
-        return base_value * 2 * coefficient
+        return (base_value * 2) * coefficient
     elif amount * 0.05 >= base_value * 2:
-        return amount * 0.05
+        return (amount * 0.05) * coefficient
     else:
         raise ValueError('Amount (value) must be non-negative number.')
 

@@ -19,5 +19,5 @@ def save_feedback(update: Update, _) -> int:
     logger.info(f"User {user_id} has left the feedback - {feedback}")
     add_column_value(user_id, 'feedback', feedback, 'feedback')
     update.message.reply_text(f'Команда разработчиков благодарит за оставленный отзыв.\n\n'
-                              f'Чтобы продолжить работу с Ботом, нажмите /start')
+                              f'Чтобы продолжить работу с ботом, нажмите /start')
     return ConversationHandler.END

@@ -197,14 +197,14 @@ def choose_type_of_nature_of_claim(update: Update, _) -> int:
     """ type_court -> instance (first, appeal, supervisory) -> legal_proceeding (lawsuit) -> claim_ls """
     keyboard = [
         [InlineKeyboardButton('Требование имущественного характера', callback_data='property_claim')],
-        [InlineKeyboardButton('Требование о взыскании расходов на содержание детей на государственном обеспечении',
+        [InlineKeyboardButton('O взыскании расходов на содержание детей на государственном обеспечении',
                               callback_data='expenses_for_children')],
-        [InlineKeyboardButton('Требование о расторжении брака', callback_data='first_divorce')],
-        [InlineKeyboardButton('Требование о расторжении повторного брака',
+        [InlineKeyboardButton('O расторжении брака', callback_data='first_divorce')],
+        [InlineKeyboardButton('O расторжении повторного брака',
                               callback_data='repeat_divorce')],
-        [InlineKeyboardButton('Требование о расторжении брака c отдельными категориями лиц',
+        [InlineKeyboardButton('O расторжении брака c отдельными категориями лиц',
                               callback_data='special_divorce')],
-        [InlineKeyboardButton('Требование о заключении, изменении, расторжении, незаключенности договора, '
+        [InlineKeyboardButton('O заключении, изменении, расторжении, незаключенности договора, '
                               'о недействительности сделки', callback_data='contract_dispute_claim')],
         [InlineKeyboardButton('Требование неимущественного характера', callback_data='non-pecuniary_claim')]
 
@@ -268,7 +268,7 @@ def choose_type_of_appeal_court_criminal_order(update: Update, _) -> int:
     keyboard = [
         [InlineKeyboardButton('Повторная надзорная жалоба, подаваемая в Верховный Суд Республики Беларусь',
                               callback_data='repeat_supreme_sup_criminal')],
-        [InlineKeyboardButton('Первичная или иная повторная надзорная жалоба, не казанная в предыдущем пункте',
+        [InlineKeyboardButton('Первичная или иная повторная надзорная жалоба, не указанная в предыдущем пункте',
                               callback_data='other_sup_criminal')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)

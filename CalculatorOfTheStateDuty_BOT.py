@@ -58,6 +58,8 @@ from handlers.Feedback_handler import feedback_conv_handler_dict
 
 from CSDB_index import TYPE_COURT, FEEDBACK
 
+from selection_dictionaries.info_dictionary import dict_info
+
 load_dotenv()
 TOKEN = os.environ.get('TOKEN')
 
@@ -110,7 +112,7 @@ def cancel(update: Update, _) -> int:
 def info(update: Update, _):
     user = update.message.from_user
     logger.info(f'User {user.id} has received info')
-    update.message.reply_text('info_check')
+    update.message.reply_text(dict_info['info'], parse_mode='HTML')
 
 
 def feedback(update: Update, _):

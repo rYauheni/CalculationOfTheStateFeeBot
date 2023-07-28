@@ -35,14 +35,14 @@ def calculating_state_duty_for_property(claim_price: float, base_value: float, u
     """
     coefficient = calculate_coefficient(user_id)
     if 0 <= claim_price * 0.05 < base_value * 25:
-        return base_value * 25 * coefficient
+        return (base_value * 25) * coefficient
     elif claim_price * 0.05 >= base_value * 25 and claim_price < base_value * 1000:
-        return claim_price * 0.05 * coefficient
+        return (claim_price * 0.05) * coefficient
     elif base_value * 1000 <= claim_price < base_value * 10000:
-        return base_value * 1000 * 0.05 + (claim_price - (base_value * 1000)) * 0.03 * coefficient
+        return (base_value * 1000 * 0.05 + (claim_price - (base_value * 1000)) * 0.03) * coefficient
     elif claim_price >= base_value * 10000:
         if claim_price * 0.01 < base_value * 1000 * 0.05 + base_value * 9000 * 0.03:
-            return base_value * 1000 * 0.05 + base_value * 9000 * 0.03 * coefficient
+            return (base_value * 1000 * 0.05 + base_value * 9000 * 0.03) * coefficient
         return claim_price * 0.01 * coefficient
     else:
         raise ValueError('Claim price (value) must be non-negative number.')

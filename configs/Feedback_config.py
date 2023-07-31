@@ -3,7 +3,7 @@ import logging
 from telegram import Update
 from telegram.ext import ConversationHandler
 
-from status_log_db.bot_status_log_db import add_column_value
+from orm.orm_functions import add_column_value
 
 
 logging.basicConfig(

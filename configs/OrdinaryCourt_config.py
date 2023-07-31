@@ -32,7 +32,7 @@ from calc_n_convert_func.Court_converting_func import (
     raise_incorrect_value
 )
 
-from status_log_db.bot_status_log_db import (
+from orm.orm_functions import (
     get_column_value,
     add_column_value,
     get_new_counter_value

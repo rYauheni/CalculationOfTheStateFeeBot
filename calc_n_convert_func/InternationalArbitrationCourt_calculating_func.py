@@ -1,4 +1,4 @@
-from status_log_db.bot_status_log_db import get_column_value
+from orm.orm_functions import get_column_value
 
 
 def calculate_coefficient(user_id: int) -> float:

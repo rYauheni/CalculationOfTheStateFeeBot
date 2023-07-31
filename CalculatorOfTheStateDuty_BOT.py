@@ -32,7 +32,7 @@ from telegram.ext import Updater, CommandHandler, CallbackQueryHandler, Conversa
 
 from settings.settings import ACCESS
 
-from status_log_db.bot_status_log_db import (
+from orm.orm_functions import (
     create_table,
     add_new_row,
     add_column_value

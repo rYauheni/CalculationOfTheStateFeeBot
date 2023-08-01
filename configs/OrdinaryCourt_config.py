@@ -3,8 +3,6 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ConversationHandler
 
-from decimal import Decimal, ROUND_HALF_UP
-
 from selection_dictionaries.OrdinaryCourt_dictionary import (
     dict_instance,
     dict_proceeding,

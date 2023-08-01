@@ -51,6 +51,17 @@ def add_test_users():
                   'property_claim', None, None, None, None, None, 4)
     add_values(203, values_203)
 
+    # INTELLECTUAL PROPERTY COURT
+    add_new_row(301)  # IPC: first instance
+    values_301 = (301, 'test_user_301', 'intellectual_property_court', 'first_instance', 'lawsuit_proceeding', None,
+                  'property_claim', None, None, None, None, None, 4)
+    add_values(301, values_301)
+
+    add_new_row(302)  # IPC: supervisory instance
+    values_302 = (302, 'test_user_302', 'intellectual_property_court', 'supervisory', 'lawsuit_proceeding', None,
+                  'property_claim', None, None, None, None, None, 4)
+    add_values(302, values_302)
+
 
 def main():
     create_table('status_log')

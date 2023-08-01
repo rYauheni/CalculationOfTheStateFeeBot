@@ -16,24 +16,40 @@ def add_values(user_id, values):
 def add_test_users():
     # ECONOMIC COURT
     add_new_row(101)  # EC: first instance + property_claim
-    values_101 = (101, 'test_user_101', 'economic_court', 'first_instance', 'lawsuit_proceeding', 'NULL',
-                  'property_claim', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 4)
+    values_101 = (101, 'test_user_101', 'economic_court', 'first_instance', 'lawsuit_proceeding', None,
+                  'property_claim', None, None, None, None, None, 4)
     add_values(101, values_101)
 
     add_new_row(102)  # EC: first instance + quality of goods claim
-    values_102 = (102, 'test_user_102', 'economic_court', 'first_instance', 'lawsuit_proceeding', 'NULL',
-                  'quality_of_goods_claim', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 4)
+    values_102 = (102, 'test_user_102', 'economic_court', 'first_instance', 'lawsuit_proceeding', None,
+                  'quality_of_goods_claim', None, None, None, None, None, 4)
     add_values(102, values_102)
 
     add_new_row(103)  # EC: appeal instance + property claim
-    values_103 = (103, 'test_user_103', 'economic_court', 'appeal', 'lawsuit_proceeding', 'NULL',
-                  'property_claim', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 4)
+    values_103 = (103, 'test_user_103', 'economic_court', 'appeal', 'lawsuit_proceeding', None,
+                  'property_claim', None, None, None, None, None, 4)
     add_values(103, values_103)
 
     add_new_row(104)  # EC: cassation instance + quality of goods claim
-    values_104 = (104, 'test_user_104', 'economic_court', 'cassation', 'lawsuit_proceeding', 'NULL',
-                  'quality_of_goods_claim', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 4)
+    values_104 = (104, 'test_user_104', 'economic_court', 'cassation', 'lawsuit_proceeding', None,
+                  'quality_of_goods_claim', None, None, None, None, None, 4)
     add_values(104, values_104)
+
+    # ORDINARY COURT
+    add_new_row(201)  # OC: first instance
+    values_201 = (201, 'test_user_201', 'ordinary_court', 'first_instance', 'lawsuit_proceeding', None,
+                  'property_claim', None, None, None, None, None, 4)
+    add_values(201, values_201)
+
+    add_new_row(202)  # OC: appeal instance
+    values_202 = (202, 'test_user_202', 'ordinary_court', 'appeal', 'lawsuit_proceeding', None,
+                  'property_claim', None, None, None, None, None, 4)
+    add_values(202, values_202)
+
+    add_new_row(203)  # OC: criminal + in part of civil lawsuit
+    values_203 = (203, 'test_user_203', 'ordinary_court', 'criminal', None, 'in_part_of_civil_lawsuit',
+                  'property_claim', None, None, None, None, None, 4)
+    add_values(203, values_203)
 
 
 def main():

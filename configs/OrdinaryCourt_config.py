@@ -25,6 +25,8 @@ from calc_n_convert_func.OrdinaryCourt_calculating_func import (
     calculating_state_duty_for_get_documents
 )
 
+from calc_n_convert_func.rounding_func import round_dec
+
 from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     converting_user_fine,
@@ -370,7 +372,6 @@ def determine_size_of_state_duty_for_property_and_order_claim(update: Update, _)
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         state_duty = calculating_state_duty_for_property_and_order(convert_claim_price, BASE_VALUE, user_id)
-        state_duty = float(Decimal(str(state_duty)).quantize(Decimal('1.00'), ROUND_HALF_UP))
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END
@@ -391,7 +392,6 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
             update.message.reply_text(raise_incorrect_value()[1])
         else:
             state_duty = calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, BASE_VALUE)
-            state_duty = float(Decimal(str(state_duty)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                       parse_mode='HTML')
             return ConversationHandler.END
@@ -403,7 +403,6 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
             update.message.reply_text(raise_incorrect_value()[1])
         else:
             state_duty = calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, BASE_VALUE)
-            state_duty = float(Decimal(str(state_duty)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                       parse_mode='HTML')
             return ConversationHandler.END
@@ -423,7 +422,6 @@ def determine_size_of_state_duty_for_get_copy_of_court_order(update: Update, _) 
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         state_duty = calculating_state_duty_for_get_copy_of_court_order(convert_pages, BASE_VALUE)
-        state_duty = float(Decimal(str(state_duty)).quantize(Decimal('1.00'), ROUND_HALF_UP))
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END
@@ -440,7 +438,6 @@ def determine_size_of_state_duty_for_get_documents(update: Update, _) -> int:
         update.message.reply_text(raise_incorrect_value()[1])
     else:
         state_duty = calculating_state_duty_for_get_documents(convert_pages, BASE_VALUE)
-        state_duty = float(Decimal(str(state_duty)).quantize(Decimal('1.00'), ROUND_HALF_UP))
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
                                   parse_mode='HTML')
         return ConversationHandler.END
@@ -455,7 +452,7 @@ def determine_size_of_state_duty_x01(update: Update, _) -> int:
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_other[get_column_value(user_id, 'another_action')]}")
     logger.info(f"User {user_id} has chosen another procedural action - {get_column_value(user_id, 'another_action')}")
-    state_duty = float(Decimal(str(BASE_VALUE * 0.1)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = round_dec(BASE_VALUE * 0.1)
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
@@ -511,7 +508,7 @@ def determine_size_of_state_duty_x1(update: Update, _) -> int:
                                                      f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    state_duty = float(Decimal(str(BASE_VALUE * 1 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = round_dec(round_dec(BASE_VALUE * 1) * coefficient)
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
@@ -551,7 +548,7 @@ def determine_size_of_state_duty_x2(update: Update, _) -> int:
                                                      f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    state_duty = float(Decimal(str(BASE_VALUE * 2 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = round_dec(round_dec(BASE_VALUE * 2) * coefficient)
     update.callback_query.message.reply_text(
         f'Размер государственной пошлины составляет:\n\n'
         f'<b>{state_duty}</b> BYN', parse_mode='HTML')
@@ -587,7 +584,7 @@ def determine_size_of_state_duty_x3(update: Update, _) -> int:
                                                      f"{dict_other[get_column_value(user_id, 'another_action')]}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    state_duty = float(Decimal(str(BASE_VALUE * 3 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = round_dec(round_dec(BASE_VALUE * 3) * coefficient)
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
@@ -605,7 +602,7 @@ def determine_size_of_state_duty_x4(update: Update, _) -> int:
     logger.info(f"User {user_id} has chosen another procedural action - {get_column_value(user_id, 'claim')}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    state_duty = float(Decimal(str(BASE_VALUE * 4 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = round_dec(round_dec(BASE_VALUE * 4) * coefficient)
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
@@ -623,7 +620,7 @@ def determine_size_of_state_duty_x5(update: Update, _) -> int:
     logger.info(f"User {user_id} has chosen another procedural action - {get_column_value(user_id, 'claim')}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    state_duty = float(Decimal(str(BASE_VALUE * 5 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = round_dec(round_dec(BASE_VALUE * 5) * coefficient)
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END
@@ -641,7 +638,7 @@ def determine_size_of_state_duty_x8(update: Update, _) -> int:
     logger.info(f"User {user_id} has chosen another procedural action - {get_column_value(user_id, 'claim')}")
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    state_duty = float(Decimal(str(BASE_VALUE * 8 * coefficient)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+    state_duty = round_dec(round_dec(BASE_VALUE * 8) * coefficient)
     update.callback_query.message.reply_text(f'Размер государственной пошлины составляет:\n\n'
                                              f'<b>{state_duty}</b> BYN', parse_mode='HTML')
     return ConversationHandler.END

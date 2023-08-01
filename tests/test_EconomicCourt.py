@@ -1,9 +1,6 @@
 import unittest
 
-from decimal import Decimal, ROUND_HALF_UP
-
 from calc_n_convert_func.EconomicCourt_calculating_func import (
-    calculate_coefficient,
     calculating_state_duty_for_property,
     calculating_state_duty_for_order,
     calculating_state_duty_for_administrative_case,

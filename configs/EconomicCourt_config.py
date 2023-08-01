@@ -16,13 +16,14 @@ from selection_dictionaries.EconomicCourt_dictionary import (
 from selection_dictionaries.Court_dictionary import dict_type_court
 
 from calc_n_convert_func.EconomicCourt_calculating_func import (
-    round_dec,
     calculate_coefficient,
     calculating_state_duty_for_property,
     calculating_state_duty_for_order,
     calculating_state_duty_for_administrative_case,
     calculating_state_duty_for_get_documents
 )
+
+from calc_n_convert_func.rounding_func import round_dec
 
 from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,

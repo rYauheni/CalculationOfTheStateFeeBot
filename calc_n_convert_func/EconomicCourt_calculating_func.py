@@ -4,14 +4,9 @@ The calculating functions calculate the reduction coefficient for state duty and
 the amount of the state duty in the case when the amount of the state duty depends on the size of the value.
 """
 
-from decimal import Decimal, ROUND_HALF_UP
-
 from orm.orm_functions import get_column_value
 
-
-def round_dec(input_value: (str, int, float)) -> float:
-    round_value = float(Decimal(str(input_value)).quantize(Decimal('1.00'), ROUND_HALF_UP))
-    return round_value
+from calc_n_convert_func.rounding_func import round_dec
 
 
 def calculate_coefficient(user_id: int) -> dict[str, float]:

@@ -24,6 +24,8 @@ The calculation made by this bot CAN NOT be used as evidence in court and DOES N
 
 import os
 import logging
+import time
+
 from dotenv import load_dotenv
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -162,4 +164,9 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    while True:
+        try:
+            main()
+        except Exception as e:
+            logger.info(f"Raised exception: {e}")
+            time.sleep(5)

@@ -3,13 +3,12 @@ import logging
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ConversationHandler
 
-from decimal import Decimal, ROUND_HALF_UP
-
 from selection_dictionaries.InternationalArbitrationCourt_dictionary import (
     dict_subject,
     dict_proceeding,
     dict_instance,
-    dict_claim
+    dict_claim,
+    dict_limit_sp
 )
 
 from selection_dictionaries.Court_dictionary import dict_type_court
@@ -20,9 +19,14 @@ from calc_n_convert_func.InternationalArbitrationCourt_calculating_func import (
     calculating_arbitration_fee_for_property_for_non_resident
 )
 
+from calc_n_convert_func.rounding_func import round_dec
+
+from calc_n_convert_func.exceptions import FormatError, SizeError
+
 from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
-    raise_incorrect_value
+    raise_incorrect_value,
+    raise_incorrect_size
 )
 
 from orm.orm_functions import (
@@ -171,19 +175,24 @@ def determine_size_of_arbitration_fee_for_property_claim(update: Update, _) -> i
     logger.info(f"User {user_id} has specified the price of the claim - {update.message.text}")
     try:
         convert_claim_price = converting_user_amount(str(update.message.text))
-    except ValueError:
+    except FormatError:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
+    except SizeError:
+        update.message.reply_text(raise_incorrect_size()[0])
+        update.message.reply_text(raise_incorrect_size()[1])
     else:
         if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'resident':
+            if get_column_value(user_id, 'proceeding') and get_column_value(user_id, 'proceeding') == 'simplified' \
+                    and convert_claim_price > 10000 * BASE_VALUE:
+                update.message.reply_text(dict_limit_sp['limit_sp'], parse_mode='HTML')
+                return ConversationHandler.END
             arbitration_fee = calculating_arbitration_fee_for_property_for_resident(convert_claim_price,
                                                                                     BASE_VALUE, user_id)
-            arbitration_fee = float(Decimal(str(arbitration_fee)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер арбитражного сбора составляет:\n\n<b>{arbitration_fee}</b> BYN*{note}',
                                       parse_mode='HTML')
         elif get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'non-resident':
             arbitration_fee = calculating_arbitration_fee_for_property_for_non_resident(convert_claim_price, user_id)
-            arbitration_fee = float(Decimal(str(arbitration_fee)).quantize(Decimal('1.00'), ROUND_HALF_UP))
             update.message.reply_text(f'Размер арбитражного сбора составляет:\n\n<b>{arbitration_fee}</b> EUR*{note}',
                                       parse_mode='HTML')
         return ConversationHandler.END
@@ -200,7 +209,7 @@ def determine_size_of_arbitration_fee_for_non_pecuniary_claim(update: Update, _)
                                                  f"{dict_claim[get_column_value(user_id, 'claim')]}")
 
     if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'resident':
-        arbitration_fee = float(Decimal(str(BASE_VALUE * 50)).quantize(Decimal('1.00'), ROUND_HALF_UP))
+        arbitration_fee = round_dec(BASE_VALUE * 50)
         update.callback_query.message.reply_text(f'Размер арбитражного сбора составляет:\n\n'
                                                  f'<b>{arbitration_fee}</b> BYN*{note}', parse_mode='HTML')
     elif get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'non-resident':

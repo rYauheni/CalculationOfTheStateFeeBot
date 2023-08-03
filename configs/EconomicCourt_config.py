@@ -29,7 +29,8 @@ from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     converting_user_fine,
     converting_user_pages,
-    raise_incorrect_value
+    raise_incorrect_value,
+    raise_incorrect_size
 )
 
 from orm.orm_functions import (
@@ -453,6 +454,9 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
         except ValueError:
             update.message.reply_text(raise_incorrect_value()[0])
             update.message.reply_text(raise_incorrect_value()[1])
+        except Warning:
+            update.message.reply_text(raise_incorrect_size()[0])
+            update.message.reply_text(raise_incorrect_size()[1])
         else:
             state_duty = calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, BASE_VALUE)
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -464,6 +468,9 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
         except ValueError:
             update.message.reply_text(raise_incorrect_value()[0])
             update.message.reply_text(raise_incorrect_value()[1])
+        except Warning:
+            update.message.reply_text(raise_incorrect_size()[0])
+            update.message.reply_text(raise_incorrect_size()[1])
         else:
             state_duty = calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, BASE_VALUE)
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',

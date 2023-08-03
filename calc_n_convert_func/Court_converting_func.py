@@ -5,7 +5,9 @@ The converting functions convert the values entered by the user into the values 
 
 import re
 
-from decimal import Decimal, ROUND_HALF_UP
+from calc_n_convert_func.rounding_func import round_dec
+
+from calc_n_convert_func.exceptions import FormatError, SizeError
 
 
 def converting_user_amount(amount: str) -> float:
@@ -22,9 +24,10 @@ def converting_user_amount(amount: str) -> float:
     data_type_check = re.search(r'^\d+\.*\d*$', amount)
     if data_type_check:
         if float(amount) >= 0:
-            return float(Decimal(str(amount)).quantize(Decimal('1.00'), ROUND_HALF_UP))
-        raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
-    raise ValueError('Amount (value) must be a string that can be converted to a non-negative number.')
+            size_check(float(amount))
+            return round_dec(amount)
+        raise FormatError('Amount (value) must be a string that can be converted to a non-negative number.')
+    raise FormatError('Amount (value) must be a string that can be converted to a non-negative number.')
 
 
 def converting_user_fine(fine: str) -> list:
@@ -39,6 +42,7 @@ def converting_user_fine(fine: str) -> list:
     :param fine: str
     :return: list
     """
+
     return fine.split('=') if fine.count('=') == 1 else [fine]
 
 
@@ -51,9 +55,10 @@ def converting_user_pages(number: str) -> int:
     :return: int
     """
     if number.isdigit() and int(number) >= 0:
+        size_check(float(number))
         return int(number)
     else:
-        raise ValueError('Number (value) must be a string that can be converted to a non-negative integer.')
+        raise FormatError('Number (value) must be a string that can be converted to a non-negative integer.')
 
 
 def raise_incorrect_value() -> tuple:
@@ -65,5 +70,17 @@ def raise_incorrect_value() -> tuple:
     return (
         'Значение указано некорректно.\nФормат ввода значения:\n'
         '1111 (для целочисленных значений)\nили\n1111.11 (для вещественных значений)',
-        '\nПовторно введите значение:'
+        'Повторно введите значение:'
+    )
+
+
+def size_check(input_value):
+    if float(input_value) > 999999999999999999:
+        raise SizeError('Number (value) must be less then 999999999999999999')
+
+
+def raise_incorrect_size():
+    return (
+        'Значение указано некорректно.\nРазмер значения не должен превышать:\n999999999999999999999999',
+        'Повторно введите значение:'
     )

@@ -97,7 +97,7 @@ def start(update: Update, _) -> int:
     else:
         update.message.reply_text('В настоящий момент производятся технические работы.\n'
                                   'Функция определения государственной пошлины временно недоступна.')
-        ConversationHandler.END
+        return ConversationHandler.END
 
 
 def cancel(update: Update, _) -> int:

@@ -62,6 +62,32 @@ def add_test_users():
                   'property_claim', None, None, None, None, None, 4)
     add_values(302, values_302)
 
+    # INTERNATIONAL ARBITRATION COURT
+    add_new_row(401)  # IPC: resident + collegial + ordinary proceeding (1.0, 1.0)
+    values_401 = (401, 'test_user_401', 'international_arbitration_court', 'collegial', 'ordinary', None,
+                  'property_claim', None, 'resident', None, None, None, 5)
+    add_values(401, values_401)
+
+    add_new_row(402)  # IPC: resident + one + ordinary proceeding (0.7, 1.0)
+    values_402 = (402, 'test_user_402', 'international_arbitration_court', 'one', 'ordinary', None,
+                  'property_claim', None, 'resident', None, None, None, 5)
+    add_values(402, values_402)
+
+    add_new_row(403)  # IPC: resident + one + ordinary proceeding (0.7, 0.9)
+    values_403 = (403, 'test_user_403', 'international_arbitration_court', None, 'simplified', None,
+                  'property_claim', None, 'resident', None, None, None, 4)
+    add_values(403, values_403)
+
+    add_new_row(404)  # IPC: non-resident + collegial (1.0)
+    values_404 = (404, 'test_user_404', 'international_arbitration_court', 'collegial', None, None,
+                  'property_claim', None, 'non-resident', None, None, None, 4)
+    add_values(404, values_404)
+
+    add_new_row(405)  # IPC: non-resident + one (0.7)
+    values_405 = (405, 'test_user_405', 'international_arbitration_court', 'one', None, None,
+                  'property_claim', None, 'non-resident', None, None, None, 4)
+    add_values(405, values_405)
+
 
 def main():
     create_table('status_log')

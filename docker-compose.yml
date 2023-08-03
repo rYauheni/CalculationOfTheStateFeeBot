@@ -14,6 +14,7 @@ services:
       - db
     env_file:
       - .env
+    restart: unless-stopped
   db:
     image: postgres:alpine
     environment:

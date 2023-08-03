@@ -22,10 +22,13 @@ from calc_n_convert_func.IntellectualPropertyCourt_calculating_func import (
 
 from calc_n_convert_func.rounding_func import round_dec
 
+from calc_n_convert_func.exceptions import FormatError, SizeError
+
 from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     converting_user_pages,
-    raise_incorrect_value
+    raise_incorrect_value,
+    raise_incorrect_size
 )
 
 from orm.orm_functions import (
@@ -210,9 +213,12 @@ def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
     logger.info(f"User {user_id} has specified the price of the claim - {update.message.text}")
     try:
         convert_claim_price = converting_user_amount(str(update.message.text))
-    except ValueError:
+    except FormatError:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
+    except SizeError:
+        update.message.reply_text(raise_incorrect_size()[0])
+        update.message.reply_text(raise_incorrect_size()[1])
     else:
         state_duty = calculating_state_duty_for_property(convert_claim_price, BASE_VALUE, user_id)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -227,9 +233,12 @@ def determine_size_of_state_duty_for_get_copy_of_court_order(update: Update, _) 
     logger.info(f"User {user_id} has specified the number of pages - {update.message.text}")
     try:
         convert_pages = converting_user_pages(str(update.message.text))
-    except ValueError:
+    except FormatError:
         update.message.reply_text('Значение количества страниц должно быть целым неотрицательным числом')
         update.message.reply_text(raise_incorrect_value()[1])
+    except SizeError:
+        update.message.reply_text(raise_incorrect_size()[0])
+        update.message.reply_text(raise_incorrect_size()[1])
     else:
         if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'entity':
             state_duty = calculating_state_duty_for_get_copy_of_court_order_for_entity(convert_pages, BASE_VALUE)

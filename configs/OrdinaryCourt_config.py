@@ -25,11 +25,14 @@ from calc_n_convert_func.OrdinaryCourt_calculating_func import (
 
 from calc_n_convert_func.rounding_func import round_dec
 
+from calc_n_convert_func.exceptions import FormatError, SizeError
+
 from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     converting_user_fine,
     converting_user_pages,
-    raise_incorrect_value
+    raise_incorrect_value,
+    raise_incorrect_size
 )
 
 from orm.orm_functions import (
@@ -365,9 +368,12 @@ def determine_size_of_state_duty_for_property_and_order_claim(update: Update, _)
     logger.info(f"User {user_id} has specified the price of the claim (amount of recovery) - {update.message.text}")
     try:
         convert_claim_price = converting_user_amount(str(update.message.text))
-    except ValueError:
+    except FormatError:
         update.message.reply_text(raise_incorrect_value()[0])
         update.message.reply_text(raise_incorrect_value()[1])
+    except SizeError:
+        update.message.reply_text(raise_incorrect_size()[0])
+        update.message.reply_text(raise_incorrect_size()[1])
     else:
         state_duty = calculating_state_duty_for_property_and_order(convert_claim_price, BASE_VALUE, user_id)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -385,9 +391,12 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
         try:
             convert_fine = converting_user_amount(str_to_list_fine[0])
             convert_b_v = converting_user_amount(str_to_list_fine[1])
-        except ValueError:
+        except FormatError:
             update.message.reply_text(raise_incorrect_value()[0])
             update.message.reply_text(raise_incorrect_value()[1])
+        except SizeError:
+            update.message.reply_text(raise_incorrect_size()[0])
+            update.message.reply_text(raise_incorrect_size()[1])
         else:
             state_duty = calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, BASE_VALUE)
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -396,9 +405,12 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
     elif len(str_to_list_fine) == 1:
         try:
             convert_fine = converting_user_amount(str_to_list_fine[0])
-        except ValueError:
+        except FormatError:
             update.message.reply_text(raise_incorrect_value()[0])
             update.message.reply_text(raise_incorrect_value()[1])
+        except SizeError:
+            update.message.reply_text(raise_incorrect_size()[0])
+            update.message.reply_text(raise_incorrect_size()[1])
         else:
             state_duty = calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, BASE_VALUE)
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -415,7 +427,7 @@ def determine_size_of_state_duty_for_get_copy_of_court_order(update: Update, _) 
     logger.info(f"User {user_id} has specified the number of pages - {update.message.text}")
     try:
         convert_pages = converting_user_pages(str(update.message.text))
-    except ValueError:
+    except FormatError:
         update.message.reply_text('Значение количества страниц должно быть целым неотрицательным числом')
         update.message.reply_text(raise_incorrect_value()[1])
     else:
@@ -431,7 +443,7 @@ def determine_size_of_state_duty_for_get_documents(update: Update, _) -> int:
     logger.info(f"User {user_id} has specified the number of pages - {update.message.text}")
     try:
         convert_pages = converting_user_pages(str(update.message.text))
-    except ValueError:
+    except FormatError:
         update.message.reply_text('Значение количества страниц должно быть целым неотрицательным числом')
         update.message.reply_text(raise_incorrect_value()[1])
     else:

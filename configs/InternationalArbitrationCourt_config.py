@@ -26,7 +26,8 @@ from calc_n_convert_func.exceptions import FormatError, SizeError
 from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     raise_incorrect_value,
-    raise_incorrect_size
+    raise_incorrect_size,
+    raise_exception
 )
 
 from orm.orm_functions import (
@@ -181,6 +182,9 @@ def determine_size_of_arbitration_fee_for_property_claim(update: Update, _) -> i
     except SizeError:
         update.message.reply_text(raise_incorrect_size()[0])
         update.message.reply_text(raise_incorrect_size()[1])
+    except Exception:
+        update.message.reply_text(raise_exception()[0])
+        update.message.reply_text(raise_exception()[1])
     else:
         if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'resident':
             if get_column_value(user_id, 'proceeding') and get_column_value(user_id, 'proceeding') == 'simplified' \

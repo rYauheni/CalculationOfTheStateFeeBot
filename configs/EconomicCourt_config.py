@@ -33,6 +33,7 @@ from calc_n_convert_func.Court_converting_func import (
     converting_user_pages,
     raise_incorrect_value,
     raise_incorrect_size,
+    raise_exception
 )
 
 from orm.orm_functions import (
@@ -423,6 +424,9 @@ def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
     except SizeError:
         update.message.reply_text(raise_incorrect_size()[0])
         update.message.reply_text(raise_incorrect_size()[1])
+    except Exception:
+        update.message.reply_text(raise_exception()[0])
+        update.message.reply_text(raise_exception()[1])
     else:
         state_duty = calculating_state_duty_for_property(convert_claim_price, BASE_VALUE, user_id)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -442,6 +446,9 @@ def determine_size_of_state_duty_for_order_claim(update: Update, _) -> float:
     except SizeError:
         update.message.reply_text(raise_incorrect_size()[0])
         update.message.reply_text(raise_incorrect_size()[1])
+    except Exception:
+        update.message.reply_text(raise_exception()[0])
+        update.message.reply_text(raise_exception()[1])
     else:
         state_duty = calculating_state_duty_for_order(convert_amount_of_recovery, BASE_VALUE)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -465,6 +472,9 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
         except SizeError:
             update.message.reply_text(raise_incorrect_size()[0])
             update.message.reply_text(raise_incorrect_size()[1])
+        except Exception:
+            update.message.reply_text(raise_exception()[0])
+            update.message.reply_text(raise_exception()[1])
         else:
             state_duty = calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, BASE_VALUE)
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -479,6 +489,9 @@ def determine_size_of_state_duty_for_administrative_case(update: Update, _) -> i
         except SizeError:
             update.message.reply_text(raise_incorrect_size()[0])
             update.message.reply_text(raise_incorrect_size()[1])
+        except Exception:
+            update.message.reply_text(raise_exception()[0])
+            update.message.reply_text(raise_exception()[1])
         else:
             state_duty = calculating_state_duty_for_administrative_case(convert_fine, convert_b_v, BASE_VALUE)
             update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -498,6 +511,12 @@ def determine_size_of_state_duty_for_get_documents(update: Update, _) -> int:
     except FormatError:
         update.message.reply_text('Значение количества страниц должно быть целым неотрицательным числом')
         update.message.reply_text(raise_incorrect_value()[1])
+    except SizeError:
+        update.message.reply_text(raise_incorrect_size()[0])
+        update.message.reply_text(raise_incorrect_size()[1])
+    except Exception:
+        update.message.reply_text(raise_exception()[0])
+        update.message.reply_text(raise_exception()[1])
     else:
         state_duty = calculating_state_duty_for_get_documents(convert_pages, BASE_VALUE)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',

@@ -28,7 +28,8 @@ from calc_n_convert_func.Court_converting_func import (
     converting_user_amount,
     converting_user_pages,
     raise_incorrect_value,
-    raise_incorrect_size
+    raise_incorrect_size,
+    raise_exception
 )
 
 from orm.orm_functions import (
@@ -219,6 +220,9 @@ def determine_size_of_state_duty_for_property_claim(update: Update, _) -> int:
     except SizeError:
         update.message.reply_text(raise_incorrect_size()[0])
         update.message.reply_text(raise_incorrect_size()[1])
+    except Exception:
+        update.message.reply_text(raise_exception()[0])
+        update.message.reply_text(raise_exception()[1])
     else:
         state_duty = calculating_state_duty_for_property(convert_claim_price, BASE_VALUE, user_id)
         update.message.reply_text(f'Размер государственной пошлины составляет:\n\n<b>{state_duty}</b> BYN',
@@ -239,6 +243,9 @@ def determine_size_of_state_duty_for_get_copy_of_court_order(update: Update, _) 
     except SizeError:
         update.message.reply_text(raise_incorrect_size()[0])
         update.message.reply_text(raise_incorrect_size()[1])
+    except Exception:
+        update.message.reply_text(raise_exception()[0])
+        update.message.reply_text(raise_exception()[1])
     else:
         if get_column_value(user_id, 'subject') and get_column_value(user_id, 'subject') == 'entity':
             state_duty = calculating_state_duty_for_get_copy_of_court_order_for_entity(convert_pages, BASE_VALUE)

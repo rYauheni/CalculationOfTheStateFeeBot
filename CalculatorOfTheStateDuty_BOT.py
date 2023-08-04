@@ -170,3 +170,4 @@ if __name__ == '__main__':
         except Exception as e:
             logger.info(f"Raised exception: {e}")
             time.sleep(5)
+

@@ -76,7 +76,7 @@ def choose_instance_oc(update: Update, _) -> int:
     counter = get_new_counter_value(user_id)
     add_column_value(user_id, 'type_court', type_court)
     logger.info(f"User {user_id} has chosen the type of the court "
-                f"- {dict_type_court[get_column_value(user_id, 'type_court')]}")
+                f"- {get_column_value(user_id, 'type_court')}")
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_type_court[get_column_value(user_id, 'type_court')]}")
     return OC_INSTANCE

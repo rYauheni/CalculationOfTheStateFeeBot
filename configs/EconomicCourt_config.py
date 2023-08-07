@@ -273,8 +273,9 @@ def choose_subject(update: Update, _) -> int:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    update.callback_query.message.reply_text('Выберите юридический статус лица, подающего исковое заявление '
-                                             '(заявление, жалобу):', reply_markup=reply_markup)
+    update.callback_query.message.reply_text('Выберите юридический статус лица, подающего(-вавшего) исковое заявление '
+                                             '(заявление, жалобу) для рассмотрения по существу '
+                                             '(в суд первой инстанции):', reply_markup=reply_markup)
     user_id = update.callback_query.from_user.id
     counter = get_new_counter_value(user_id)
 

@@ -23,6 +23,6 @@ apps/bot/test
 apps/web/venv
 apps/web/vendor/*
 /code_archive/
-/status_log.db
 /tests/user_id_for_test.py
 /.env
+/csd_bot_sqlite_db.db

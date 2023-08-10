@@ -5,7 +5,7 @@ when working with the Bot
 
 import sqlite3
 
-data_base = 'status_log.db'
+data_base = 'csd_bot_postgres_db'
 table_status_log = 'status_log'
 table_feedback = 'feedback'
 

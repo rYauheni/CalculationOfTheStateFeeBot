@@ -7,3 +7,6 @@ ACCESS = True
 
 # Indicates the date as of which legal acts are applied.
 ACTUALITY_CHECK_DATE = '26.07.2023'
+
+# Defines settings for development or production will be applied.
+PRODUCTION = True

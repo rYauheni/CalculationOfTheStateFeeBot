@@ -5,9 +5,30 @@ when working with the Bot
 
 import sqlite3
 
+import psycopg2
+
+import os
+from dotenv import load_dotenv
+
+from settings.settings import PRODUCTION
+
 data_base = 'csd_bot_postgres_db'
 table_status_log = 'status_log'
 table_feedback = 'feedback'
+
+
+def connect_dbms():
+    if PRODUCTION:
+        load_dotenv()
+        conn_postgres = psycopg2.connect(
+            database=os.environ.get('DB_NAME'),
+            user=os.environ.get('DB_USER'),
+            password=os.environ.get('DB_PASSWORD'),
+            # host=os.environ.get('DB_HOST')
+        )
+        return conn_postgres
+    conn_sqlite = sqlite3.connect('csd_bot_sqlite_db.db')
+    return conn_sqlite
 
 
 def create_table(table):
@@ -16,7 +37,7 @@ def create_table(table):
     :return: None
     """
     if table == 'status_log':
-        with sqlite3.connect(f'{data_base}') as db:
+        with connect_dbms() as db:
             cursor = db.cursor()
             query = f""" CREATE TABLE IF NOT EXISTS '{table_status_log}'(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -36,7 +57,7 @@ def create_table(table):
             cursor.execute(query)
             db.commit()
     elif table == 'feedback':
-        with sqlite3.connect(f'{data_base}') as db:
+        with connect_dbms() as db:
             cursor = db.cursor()
             query = f""" CREATE TABLE IF NOT EXISTS '{table_feedback}'(
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,7 +79,7 @@ def get_column_value(user_id: int, column_name: str, table: str = table_status_l
     :param table: str
     :return: list
     """
-    with sqlite3.connect(f'{data_base}') as db:
+    with connect_dbms() as db:
         cursor = db.cursor()
         query = f"SELECT {column_name} FROM '{table}' WHERE user_id = {user_id};"
         cursor.execute(query)
@@ -79,7 +100,7 @@ def add_new_row(user_id: int, table: str = table_status_log):
     :param table: str
     :return: None
     """
-    with sqlite3.connect(f'{data_base}') as db:
+    with connect_dbms() as db:
         cursor = db.cursor()
         if table == table_status_log:
             data = get_column_value(user_id, 'user_id', table)
@@ -107,7 +128,7 @@ def add_column_value(user_id: int, column_name: str, value: str, table: str = ta
     :param table: str
     :return: None
     """
-    with sqlite3.connect(f'{data_base}') as db:
+    with connect_dbms() as db:
         cursor = db.cursor()
         data = get_column_value(user_id, 'user_id', table)
         if data:
@@ -133,7 +154,7 @@ def get_new_counter_value(user_id):
     :param user_id: int
     :return: int
     """
-    with sqlite3.connect(f'{data_base}') as db:
+    with connect_dbms() as db:
         cursor = db.cursor()
         data = get_column_value(user_id, 'counter')
         if str(data):
@@ -151,7 +172,7 @@ def clear_values(user_id: int):
     :param user_id: int
     :return: None
     """
-    with sqlite3.connect(f'{data_base}') as db:
+    with connect_dbms() as db:
         cursor = db.cursor()
         query = f""" UPDATE '{table_status_log}'
                     SET user_name = NULL,
@@ -177,7 +198,7 @@ def delete_row(user_id: int):
     :param user_id: int
     :return: None
     """
-    with sqlite3.connect(f'{data_base}') as db:
+    with connect_dbms() as db:
         cursor = db.cursor()
         query = f"DELETE FROM '{table_status_log}' WHERE user_id = {user_id};"
         cursor.execute(query)

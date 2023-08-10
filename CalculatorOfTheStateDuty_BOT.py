@@ -119,7 +119,7 @@ def info(update: Update, _):
 
 def feedback(update: Update, _):
     create_table('feedback')
-    update.message.reply_text('Вы можете помочь улучшить работу Бота, оставив здесь пожелания и предложения:')
+    update.message.reply_text('Вы можете помочь улучшить работу бота, оставив здесь пожелания и предложения:')
     user_name = update.message.from_user.first_name
     user_id = update.message.from_user.id
     add_new_row(user_id, 'feedback')

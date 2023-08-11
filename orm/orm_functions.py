@@ -17,14 +17,15 @@ table_status_log = 'status_log'
 table_feedback = 'feedback'
 
 
-def connect_dbms():
+def connect_db():
     if PRODUCTION:
         load_dotenv()
         conn_postgres = psycopg2.connect(
             database=os.environ.get('DB_NAME'),
             user=os.environ.get('DB_USER'),
             password=os.environ.get('DB_PASSWORD'),
-            # host=os.environ.get('DB_HOST')
+            host=os.environ.get('DB_HOST'),
+            port=int(os.environ.get('DB_PORT'))
         )
         return conn_postgres
     conn_sqlite = sqlite3.connect('csd_bot_sqlite_db.db')
@@ -37,33 +38,57 @@ def create_table(table):
     :return: None
     """
     if table == 'status_log':
-        with connect_dbms() as db:
+        with connect_db() as db:
             cursor = db.cursor()
-            query = f""" CREATE TABLE IF NOT EXISTS '{table_status_log}'(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id TEXT,
-                user_name TEXT,
-                type_court TEXT,
-                instance TEXT,
-                proceeding TEXT,
-                criminal TEXT,
-                claim TEXT,
-                criminal_order TEXT,
-                subject TEXT,
-                court TEXT,
-                ruling_on_adm TEXT,
-                another_action TEXT,
-                counter INT); """
+            if PRODUCTION:
+                query = f"""CREATE TABLE IF NOT EXISTS {table_status_log}(
+                    id SERIAL PRIMARY KEY,
+                    user_id TEXT,
+                    user_name TEXT,
+                    type_court TEXT,
+                    instance TEXT,
+                    proceeding TEXT,
+                    criminal TEXT,
+                    claim TEXT,
+                    criminal_order TEXT,
+                    subject TEXT,
+                    court TEXT,
+                    ruling_on_adm TEXT,
+                    another_action TEXT,
+                    counter INT);"""
+            else:
+                query = f""" CREATE TABLE IF NOT EXISTS '{table_status_log}'(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id TEXT,
+                    user_name TEXT,
+                    type_court TEXT,
+                    instance TEXT,
+                    proceeding TEXT,
+                    criminal TEXT,
+                    claim TEXT,
+                    criminal_order TEXT,
+                    subject TEXT,
+                    court TEXT,
+                    ruling_on_adm TEXT,
+                    another_action TEXT,
+                    counter INT); """
             cursor.execute(query)
             db.commit()
     elif table == 'feedback':
-        with connect_dbms() as db:
+        with connect_db() as db:
             cursor = db.cursor()
-            query = f""" CREATE TABLE IF NOT EXISTS '{table_feedback}'(
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id TEXT,
-                user_name TEXT,
-                feedback TEXT); """
+            if PRODUCTION:
+                query = f"""CREATE TABLE IF NOT EXISTS {table_feedback}(
+                    id SERIAL PRIMARY KEY,
+                    user_id TEXT,
+                    user_name TEXT,
+                    feedback TEXT);"""
+            else:
+                query = f""" CREATE TABLE IF NOT EXISTS '{table_feedback}'(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id TEXT,
+                    user_name TEXT,
+                    feedback TEXT); """
             cursor.execute(query)
             db.commit()
     else:
@@ -79,9 +104,13 @@ def get_column_value(user_id: int, column_name: str, table: str = table_status_l
     :param table: str
     :return: list
     """
-    with connect_dbms() as db:
+    with connect_db() as db:
         cursor = db.cursor()
-        query = f"SELECT {column_name} FROM '{table}' WHERE user_id = {user_id};"
+        if PRODUCTION:
+            query = f"SELECT {column_name} FROM {table} WHERE user_id = '{user_id}';"
+
+        else:
+            query = f"SELECT {column_name} FROM '{table}' WHERE user_id = {user_id};"
         cursor.execute(query)
         data = cursor.fetchall()
         db.commit()
@@ -100,18 +129,24 @@ def add_new_row(user_id: int, table: str = table_status_log):
     :param table: str
     :return: None
     """
-    with connect_dbms() as db:
+    with connect_db() as db:
         cursor = db.cursor()
         if table == table_status_log:
             data = get_column_value(user_id, 'user_id', table)
             if not data:
-                query = f"INSERT INTO '{table}' (user_id) VALUES ({user_id});"
+                if PRODUCTION:
+                    query = f"INSERT INTO {table} (user_id) VALUES ('{user_id}');"
+                else:
+                    query = f"INSERT INTO '{table}' (user_id) VALUES ({user_id});"
                 cursor.execute(query)
                 db.commit()
             else:
                 clear_values(user_id)
         elif table == table_feedback:
-            query = f"INSERT INTO '{table}' (user_id) VALUES ({user_id});"
+            if PRODUCTION:
+                query = f"INSERT INTO {table} (user_id) VALUES ('{user_id}');"
+            else:
+                query = f"INSERT INTO '{table}' (user_id) VALUES ({user_id});"
             cursor.execute(query)
             db.commit()
         else:
@@ -128,15 +163,22 @@ def add_column_value(user_id: int, column_name: str, value: str, table: str = ta
     :param table: str
     :return: None
     """
-    with connect_dbms() as db:
+    with connect_db() as db:
         cursor = db.cursor()
         data = get_column_value(user_id, 'user_id', table)
         if data:
             if table == table_status_log:
-                query = f"UPDATE '{table_status_log}' SET {column_name} = '{value}' WHERE user_id = {user_id};"
+                if PRODUCTION:
+                    query = f"UPDATE {table_status_log} SET {column_name} = '{value}' WHERE user_id = '{user_id}';"
+                else:
+                    query = f"UPDATE '{table_status_log}' SET {column_name} = '{value}' WHERE user_id = {user_id};"
             elif table == table_feedback:
-                query = f"UPDATE '{table_feedback}' SET {column_name} = '{value}' " \
-                        f"WHERE id = (SELECT MAX(id) FROM '{table_feedback}' WHERE user_id = {user_id});"
+                if PRODUCTION:
+                    query = f"UPDATE {table_feedback} SET {column_name} = '{value}' " \
+                            f"WHERE id = (SELECT MAX(id) FROM {table_feedback} WHERE user_id = '{user_id}');"
+                else:
+                    query = f"UPDATE '{table_feedback}' SET {column_name} = '{value}' " \
+                            f"WHERE id = (SELECT MAX(id) FROM '{table_feedback}' WHERE user_id = {user_id});"
             else:
                 raise ValueError('Table name (value) must be <status_log> or <feedback>.')
             cursor.execute(query)
@@ -154,11 +196,14 @@ def get_new_counter_value(user_id):
     :param user_id: int
     :return: int
     """
-    with connect_dbms() as db:
+    with connect_db() as db:
         cursor = db.cursor()
         data = get_column_value(user_id, 'counter')
         if str(data):
-            query = f"UPDATE '{table_status_log}' SET counter = counter + 1 WHERE user_id = {user_id};"
+            if PRODUCTION:
+                query = f"UPDATE {table_status_log} SET counter = counter + 1 WHERE user_id = '{user_id}';"
+            else:
+                query = f"UPDATE '{table_status_log}' SET counter = counter + 1 WHERE user_id = {user_id};"
             cursor.execute(query)
             db.commit()
             return get_column_value(user_id, 'counter')
@@ -172,22 +217,38 @@ def clear_values(user_id: int):
     :param user_id: int
     :return: None
     """
-    with connect_dbms() as db:
+    with connect_db() as db:
         cursor = db.cursor()
-        query = f""" UPDATE '{table_status_log}'
-                    SET user_name = NULL,
-                            type_court = NULL,
-                            instance = NULL,
-                            proceeding = NULL,
-                            criminal = NULL,
-                            claim = NULL,
-                            criminal_order = NULL,
-                            subject = NULL,
-                            court = NULL,
-                            ruling_on_adm = NULL,
-                            another_action = NULL,
-                            counter = NULL
-                    WHERE user_id = {user_id}; """
+        if PRODUCTION:
+            query = f"""UPDATE {table_status_log}
+                            SET user_name = NULL,
+                                type_court = NULL,
+                                instance = NULL,
+                                proceeding = NULL,
+                                criminal = NULL,
+                                claim = NULL,
+                                criminal_order = NULL,
+                                subject = NULL,
+                                court = NULL,
+                                ruling_on_adm = NULL,
+                                another_action = NULL,
+                                counter = NULL
+                            WHERE user_id = '{user_id}';"""
+        else:
+            query = f""" UPDATE '{table_status_log}'
+                            SET user_name = NULL,
+                                type_court = NULL,
+                                instance = NULL,
+                                proceeding = NULL,
+                                criminal = NULL,
+                                claim = NULL,
+                                criminal_order = NULL,
+                                subject = NULL,
+                                court = NULL,
+                                ruling_on_adm = NULL,
+                                another_action = NULL,
+                                counter = NULL
+                            WHERE user_id = {user_id}; """
         cursor.execute(query)
         db.commit()
 
@@ -198,8 +259,11 @@ def delete_row(user_id: int):
     :param user_id: int
     :return: None
     """
-    with connect_dbms() as db:
+    with connect_db() as db:
         cursor = db.cursor()
-        query = f"DELETE FROM '{table_status_log}' WHERE user_id = {user_id};"
+        if PRODUCTION:
+            query = f"DELETE FROM {table_status_log} WHERE user_id = '{user_id}';"
+        else:
+            query = f"DELETE FROM '{table_status_log}' WHERE user_id = {user_id};"
         cursor.execute(query)
         db.commit()

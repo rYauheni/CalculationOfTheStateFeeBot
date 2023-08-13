@@ -359,7 +359,7 @@ def define_price_of_claim(update: Update, _) -> int:
 
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    update.callback_query.message.reply_text('Укажите цену иска (оспариваемую сумму):')
+    update.callback_query.message.reply_text('Укажите цену иска (оспариваемую сумму) в белорусских рублях (BYN):')
     return EC_DUTY_PROPERTY
 
 
@@ -372,7 +372,7 @@ def define_amount_for_order_proceeding(update: Update, _) -> int:
     update.callback_query.edit_message_text(text=f"{counter}. Вы выбрали:\n"
                                                  f"{dict_proceeding[get_column_value(user_id, 'proceeding')]}")
     logger.info(f"User {user_id} has chosen legal proceeding - {get_column_value(user_id, 'proceeding')}")
-    update.callback_query.message.reply_text('Укажите сумму взыскания:')
+    update.callback_query.message.reply_text('Укажите сумму взыскания в белорусских рублях (BYN):')
     return EC_DUTY_ORDER
 
 
@@ -386,7 +386,7 @@ def define_fine(update: Update, _) -> int:
                                                  f"{dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
     logger.info(f"User {user_id} has chosen type of a ruling on an administrative case - "
                 f"{get_column_value(user_id, 'ruling_on_adm')}")
-    update.callback_query.message.reply_text(f'Укажите размер штрафа.\n\n\n'
+    update.callback_query.message.reply_text(f'Укажите размер штрафа в белорусских рублях (BYN).\n\n\n'
                                              '<i>В случае, если на день расчёта государственной пошлины установлен иной'
                                              f' размер базовой величины ({BASE_VALUE} BYN), по сравнению с тем, который'
                                              f' существовал на день'

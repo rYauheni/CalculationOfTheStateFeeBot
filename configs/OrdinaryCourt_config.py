@@ -305,7 +305,8 @@ def define_amount(update: Update, _) -> int:
 
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    update.callback_query.message.reply_text('Укажите цену иска (сумму взыскания, оспариваемую сумму):')
+    update.callback_query.message.reply_text('Укажите цену иска (сумму взыскания, оспариваемую сумму) '
+                                             'в белорусских рублях (BYN):')
     return OC_DUTY_PROPERTY_ORDER
 
 
@@ -319,7 +320,7 @@ def define_fine(update: Update, _) -> int:
                                                  f"{dict_adm_case[get_column_value(user_id, 'ruling_on_adm')]}")
     logger.info(f"User {user_id} has chosen type of a ruling on an administrative case - "
                 f"{get_column_value(user_id, 'ruling_on_adm')}")
-    update.callback_query.message.reply_text(f'Укажите размер штрафа.\n\n\n'
+    update.callback_query.message.reply_text(f'Укажите размер штрафа в белорусских рублях (BYN).\n\n\n'
                                              '<i>В случае, если на день расчёта государственной пошлины установлен иной'
                                              f' размер базовой величины ({BASE_VALUE} BYN), по сравнению с тем, который'
                                              f' существовал на день'

@@ -189,7 +189,7 @@ def define_amount(update: Update, _) -> int:
 
     coefficient = calculate_coefficient(user_id)
     logger.info(f"Coefficient check. Current value of coefficient is: {coefficient}")
-    update.callback_query.message.reply_text('Укажите цену иска:')
+    update.callback_query.message.reply_text('Укажите цену иска в белорусских рублях (BYN):')
     return IPC_DUTY_PROPERTY
 
 

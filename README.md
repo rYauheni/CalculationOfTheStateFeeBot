@@ -72,7 +72,14 @@ ___
 1. Determine the value of environment variables in the file `.env`
 
 
-2. Run the app locally:
+2. Set in `settings/settings.py`:
+
+   ```python
+   PRODUCTION = False
+   ```
+
+
+3. Run the app locally:
 
    for Windows:
 
@@ -86,6 +93,19 @@ ___
    python3 CalculatorOfTheStateDuty_BOT.py
    ```
 
+
+4. Run unittests:
+
+   for Windows:
+   ```commandline
+   python -m unittest discover -s tests -p "test_*.py" -v
+   ```
+
+   for Linux:
+   ```commandline
+   python3 -m unittest discover -s tests -p "test_*.py" -v
+   ```
+
 ___
 
 ## Launch for production
@@ -93,7 +113,14 @@ ___
 1. Determine the value of environment variables in the file `.env`
 
 
-2. Run docker container with command:
+2. Set in `settings/settings.py`:
+
+   ```python
+   PRODUCTION = True
+   ```
+
+
+3. Run docker container with command:
 
     ```commandline
     docker-compose up

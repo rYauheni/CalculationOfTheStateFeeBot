@@ -26,3 +26,4 @@ apps/web/vendor/*
 /tests/user_id_for_test.py
 /.env
 /csd_bot_sqlite_db.db
+/logo/

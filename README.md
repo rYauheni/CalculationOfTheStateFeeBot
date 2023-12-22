@@ -1,6 +1,6 @@
 # CalculationOfTheStateDutyBot
 
-**CalculationOfTheStateDutyBot** is a Telegram bot. This bot allows you to calculate the state duty for the courts of
+[**CalculationOfTheStateDutyBot**](https://t.me/CotSD_bot) is a Telegram bot. This bot allows you to calculate the state duty for the courts of
 the Republic of Belarus,
 as well as the arbitration fee for the International Arbitration Court at the BelCCI, taking into account the following:
 
@@ -16,6 +16,8 @@ the Economic Procedure Code of the Republic of Belarus,
 the regulations of the International Arbitration Court at the BelCCI,
 the resolution of the Council of Ministers of the Republic of Belarus
 on the approval of establishing the size of the base value.
+
+You can try the application [here](https://t.me/CotSD_bot).
 ___
 
 ## Technologies

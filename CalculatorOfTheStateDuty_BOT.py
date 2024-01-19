@@ -70,9 +70,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def check():
-    pass
-
 
 def start(update: Update, _) -> int:
     if ACCESS:
